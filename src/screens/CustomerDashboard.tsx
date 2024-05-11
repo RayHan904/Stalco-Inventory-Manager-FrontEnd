@@ -14,6 +14,8 @@ import Loader from '../components/Loader';
 import InventorySummary from '../components/InventorySummary';
 import useReplenishment, { ReplenishmentData } from '../hooks/useReplenishment';
 import { validateThreshold } from '../validations/thresholdValidations';
+import SKUItems from '../components/SKUItems';
+import SKUItemDetails from '../components/SKUItemDetails';
 
 const CustomerDashboard: React.FC = () => {
     const { selectedCustomer } = useSelectedCustomer();
@@ -174,109 +176,25 @@ const CustomerDashboard: React.FC = () => {
             </Row>
             <hr />
             <Row>
-                <Col lg={3} md={4} sm={6} xs={12} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                    <h2>SKUs</h2>
-                    <InputGroup className="mb-3">
-                        <FormControl
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                        <InputGroup.Text onClick={clearSearch} style={{ cursor: 'pointer' }}>
-                            <BsX />
-                        </InputGroup.Text>
-                    </InputGroup>
-                    {isLoading ? (
-                        <div className="m-5" >
-                            <Loader />
-
-                        </div>
-                    ) : (
-
-                        <ListGroup style={{ height: window.innerWidth <= 768 ? '30vh' : '100%', overflowY: 'auto' }} >
-                            {filteredItems.map(item => (
-                                <ListGroup.Item
-                                    key={item}
-                                    action
-                                    active={selectedItem === item}
-                                    onClick={() => handleSKUSelect(item)}
-                                >
-                                    {item}
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
-                    )}
-
-                </Col>
-                {window.innerWidth <= 768 ? <hr /> : <></>}
-
-                <Col lg={9} md={8} sm={6} xs={12} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                    <div>
-                        {selectedItem ? (<div className="mb-2" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: "space-between" }}>
-                            <div >
-                                <h2>{selectedItem}</h2>
-
-                                <ListGroup >
-                                    {Object.entries(details[selectedItem] || {}).map(([key, value]) => {
-                                        if (key === 'Clayson') {
-                                            claysonData = value;
-                                        } else {
-                                            whlData = value;
-                                        }
-                                        return (
-                                            <ListGroup.Item key={key}>
-                                                {key}: {typeof value === 'number' ? value.toLocaleString() : value}
-                                            </ListGroup.Item>
-                                        );
-                                    })}
-                                    <>
-                                        <ListGroup.Item>
-                                            Clayson's Percentage: {(claysonData / (claysonData + whlData) * 100).toFixed(2)}%
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            WHL's Percentage: {(whlData / (claysonData + whlData) * 100).toFixed(2)}%
-                                        </ListGroup.Item>
-                                    </>
-                                </ListGroup>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                                {isReplenishmentLoading ? <div className='m-4'><Loader dims={50} /></div> : <Form className="p-3"  >
-                                    <Form.Group controlId="thresholdInput">
-                                        <Form.Label>Threshold</Form.Label>
-                                        <FormControl
-                                            placeholder={SKUReplenishmentData?.threshold ? SKUReplenishmentData.threshold.toString() : "Enter a number"}
-                                            aria-label="Item Threshold"
-                                            value={inputValue}
-                                            onChange={(e) => setInputValue(e.target.value)}
-                                            className={errorMessage ? 'is-invalid' : ''} 
-                                        />
-                                        {errorMessage && <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>}
-                                        <Button variant="primary" className="mt-2" onClick={handleThresholdButtonClick}>
-                                            {SKUReplenishmentData ? "UPDATE" : "ADD"}
-                                        </Button>
-                                    </Form.Group>
-
-                                </Form>}
-
-                            </div>
-                        </div>
-                        ) : (
-                            <p>Select an item to view details</p>
-                        )}
-                        {selectedItem && (<>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                height: '30rem'
-                            }}>
-                                <PieChartComponent pieChartData={{ data: [claysonData, whlData] }} />
-
-                            </div>
-
-                        </>
-                        )}
-                    </div>
-                </Col>
+                <SKUItems
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    clearSearch={clearSearch}
+                    isLoading={isLoading}
+                    filteredItems={filteredItems}
+                    selectedItem={selectedItem}a
+                    handleSKUSelect={handleSKUSelect}
+                />
+                <SKUItemDetails
+                    selectedItem={selectedItem}
+                    details={details}
+                    isReplenishmentLoading={isReplenishmentLoading}
+                    inputValue={inputValue}
+                    setInputValue={setInputValue}
+                    errorMessage={errorMessage}
+                    handleThresholdButtonClick={handleThresholdButtonClick}
+                    SKUReplenishmentData={null} // Example data
+                />
             </Row>
         </Container>
     );
