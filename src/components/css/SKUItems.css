@@ -1,0 +1,20 @@
+/* SKUItems.css */
+.sku-items-container {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.sku-list {
+    height: 100%;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .sku-list {
+        height: 30vh;
+    }
+}
+
+.loader-container {
+    margin: 20px;
+}

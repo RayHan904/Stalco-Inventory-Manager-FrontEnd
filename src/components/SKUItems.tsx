@@ -2,6 +2,8 @@ import React from 'react';
 import { Col, InputGroup, FormControl, ListGroup } from 'react-bootstrap';
 import Loader from './Loader';
 import { BsX } from 'react-icons/bs';
+import './css/SKUItems.css';
+
 
 interface SKUItemProps {
     searchTerm: string;
@@ -24,7 +26,7 @@ const SKUItems: React.FC<SKUItemProps> = ({
     handleSKUSelect
 }) => {
     return (
-        <Col lg={3} md={4} sm={6} xs={12} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <Col lg={3} md={4} sm={6} xs={12} className="sku-items-container">
             <h2>SKUs</h2>
             <InputGroup className="mb-3">
                 <FormControl
@@ -37,11 +39,11 @@ const SKUItems: React.FC<SKUItemProps> = ({
                 </InputGroup.Text>
             </InputGroup>
             {isLoading ? (
-                <div className="m-5">
+                <div className="loader-container">
                     <Loader />
                 </div>
             ) : (
-                <ListGroup style={{ height: window.innerWidth <= 768 ? '30vh' : '100%', overflowY: 'auto' }}>
+                <ListGroup className="sku-list">
                     {filteredItems.map(item => (
                         <ListGroup.Item
                             key={item}

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, ListGroup, InputGroup, FormControl, Form, Button } from 'react-bootstrap';
-import { BsX } from 'react-icons/bs';
+import { Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -8,7 +7,6 @@ import { useSelectedCustomer } from '../contexts/SelectedCustomerContext';
 import { useLoading } from '../contexts/LoadingContext';
 import { addSKUReplenishment, fetchInventory, updateSKUReplenishment, deleteSKUReplenishment } from "../services/api";
 
-import PieChartComponent from '../components/PieChartComponent';
 import BarChartComponent from '../components/BarChartComponent';
 import Loader from '../components/Loader';
 import InventorySummary from '../components/InventorySummary';
@@ -150,8 +148,6 @@ const CustomerDashboard: React.FC = () => {
     const claysonCount = summary.Clayson || 0;
     const whlCount = summary.WHL || 0;
 
-    let claysonData = 0;
-    let whlData = 0;
 
     const barChartData = {
         data: [claysonCount, whlCount],
@@ -193,7 +189,7 @@ const CustomerDashboard: React.FC = () => {
                     setInputValue={setInputValue}
                     errorMessage={errorMessage}
                     handleThresholdButtonClick={handleThresholdButtonClick}
-                    SKUReplenishmentData={null} // Example data
+                    SKUReplenishmentData={null} 
                 />
             </Row>
         </Container>

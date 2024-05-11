@@ -4,6 +4,7 @@ import Loader from './Loader';
 import PieChartComponent from './PieChartComponent';
 import { ReplenishmentData } from '../hooks/useReplenishment';
 
+
 interface SKUItemDetailProps {
     selectedItem: string;
     details: Record<string, any>;
