@@ -40,12 +40,12 @@ const Replenishments: React.FC = () => {
         <Container fluid="md" className="text-center my-4">
             
             <h1>Replenishments</h1>
-            <div className="d-flex justify-content-center " style={{ minHeight: '90vh' }}>
+            <div className="d-flex justify-content-center " style={{ minHeight: '70vh' }}>
                 {isCustomersLoading ? <Loader /> : (
                     <Container>
                         <Form onSubmit={handleSubmit}>
                             <Row className="justify-content-center mb-3">
-                                <Col md={6}>
+                                <Col md={6} className="mb-2">
                                     <Form.Group controlId="selectCustomer">
                                         <Form.Control as="select" onChange={handleSelect} defaultValue="">
                                             <option disabled value="">Select a Customer...</option>
@@ -61,7 +61,7 @@ const Replenishments: React.FC = () => {
                                     </Form.Group>
                                 </Col>
                                 <Col md="auto">
-                                    <Button variant="primary" type="submit">
+                                    <Button className="" variant="primary" type="submit">
                                         Select
                                     </Button>
                                 </Col>
@@ -79,10 +79,21 @@ const Replenishments: React.FC = () => {
                                 </div>
                             )
                         )}
+ 
 
                     </Container>
+                    
                 )}
             </div>
+            <div style={{height:"90%", display:"flex", alignItems:"flex-end", justifyContent:"center"}}>
+
+<Form.Group id="automatedMailingList" className="m-4 "  style={{height:"50px", width: "50%"}}>
+                            <Form.Label>Automated mailing list:</Form.Label>
+                            <Form.Control type="email" value="inventory@stalco.ca" disabled   className="disabled-input"/>
+                            <small className="text-muted">you are not authorized</small>
+                        </Form.Group>
+                        </div>
+
         </Container>
     );
 };

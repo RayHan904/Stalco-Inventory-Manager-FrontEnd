@@ -64,3 +64,22 @@ main {
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* Color of the scrollbar handle on hover */
 }
+
+#automatedMailingList {
+ display: flex;
+ flex-direction: column;
+}
+
+.disabled-input {
+  cursor: not-allowed;
+  position: relative;
+}
+
+.disabled-input + .text-muted {
+  display: none;
+}
+
+.disabled-input:hover + .text-muted,
+.disabled-input:focus + .text-muted {
+  display: inline;
+}
