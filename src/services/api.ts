@@ -1,7 +1,6 @@
 // api.js
 import axios from "axios";
 import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, REPLENISHMENT_URL } from "../constants";
-import { error } from "console";
 
 export interface CustomerData {
     customerId: number;
