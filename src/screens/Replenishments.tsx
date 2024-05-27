@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import Loader from "../components/Loader";
 import { useCustomers } from "../contexts/CustomerContext";
 import { toast } from "react-toastify";
