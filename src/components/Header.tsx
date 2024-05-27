@@ -15,10 +15,10 @@ const Header: React.FC = () => {
             <img
               src={logo}
               alt="Stalco Logo"
-              height="50"
+              height="47"
               style={{ marginRight: "15px" }}
             />
-            <span>Inventory Manager</span>
+            <span style={{ fontSize: "1.1rem" }}>Inventory Manager</span>
           </NavLink>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
