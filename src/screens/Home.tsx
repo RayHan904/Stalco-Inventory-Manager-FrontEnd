@@ -16,7 +16,7 @@ const Home: React.FC = () => {
     const selectedCustomerString = target.value;
     const selectedCustomerObject = JSON.parse(selectedCustomerString);
     setSelectedCustomer(selectedCustomerObject);
-    console.log(selectedCustomer)
+    console.log(selectedCustomer);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -31,10 +31,13 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Container className="text-center" style={{ minHeight: '10vh' }}>
+      <Container className="text-center" style={{ minHeight: "10vh" }}>
         <h1>Inventory distribution according to Warehouse location</h1>
       </Container>
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '75vh' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: innerWidth < 450 ? "63vh" : "75vh" }}
+      >
         {isCustomersLoading ? (
           <Loader />
         ) : (
@@ -45,11 +48,15 @@ const Home: React.FC = () => {
                   <Form.Group controlId="selectCustomer">
                     <Form.Control as="select" onChange={handleSelect}>
                       <option value="">Select a Customer...</option>
-                      {customersData && customersData.map((customer) => (
-                        <option key={customer.customerId} value={JSON.stringify(customer)}>
-                          {customer.companyName}
-                        </option>
-                      ))}
+                      {customersData &&
+                        customersData.map((customer) => (
+                          <option
+                            key={customer.customerId}
+                            value={JSON.stringify(customer)}
+                          >
+                            {customer.companyName}
+                          </option>
+                        ))}
                     </Form.Control>
                   </Form.Group>
                   <Row className="justify-content-center">

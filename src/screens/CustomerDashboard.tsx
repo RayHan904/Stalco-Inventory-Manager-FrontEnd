@@ -9,7 +9,7 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import { BsX } from "react-icons/bs";
+import { BsX, BsChevronUp, BsChevronDown } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -42,6 +42,8 @@ const CustomerDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(""); // Searching from list of SKUs
   const [inputValue, setInputValue] = useState<string>(""); //Threshold value
   const [errorMessage, setErrorMessage] = useState(""); //for input validation
+  const [listShow, setListShow] = useState(true); //list on mobile view
+  const [overviewShow, setOverviewShow] = useState(true); //overview on mobile view
 
   const { replenishmentData, isReplenishmentLoading, setReplenishmentData } =
     useReplenishment();
@@ -127,6 +129,8 @@ const CustomerDashboard: React.FC = () => {
   };
 
   const handleSKUSelect = (item: string): void => {
+    setListShow(false);
+    setOverviewShow(false);
     setSelectedItem(item);
     setErrorMessage("");
     setInputValue("");
@@ -164,6 +168,7 @@ const CustomerDashboard: React.FC = () => {
   );
 
   const clearSearch = () => {
+    setListShow(true);
     setSearchTerm("");
   };
 
@@ -178,8 +183,35 @@ const CustomerDashboard: React.FC = () => {
   };
   return (
     <Container fluid style={{ minHeight: "85vh" }}>
-      <Row style={{ height: "30vh", overflowY: "auto" }}>
-        <h1>{selectedCustomer?.companyName}</h1>
+      <Row
+        style={{
+          height: innerWidth < 500 ? (overviewShow ? "65vh" : "5vh") : "35vh",
+          overflowY:
+            innerWidth < 500 ? (overviewShow ? "auto" : "hidden") : "auto",
+          transition: "height 0.5s ease-in-out", // Add transition for height change
+        }}
+      >
+        <div className="flex-apart">
+          <h1>{selectedCustomer?.companyName}</h1>{" "}
+          <div>
+            {" "}
+            {innerWidth < 500 ? (
+              overviewShow ? (
+                <BsChevronUp
+                  className="arrow-icon"
+                  onClick={() => setOverviewShow(false)}
+                />
+              ) : (
+                <BsChevronDown
+                  className="arrow-icon"
+                  onClick={() => setOverviewShow(true)}
+                />
+              )
+            ) : (
+              ""
+            )}{" "}
+          </div>
+        </div>
         {isLoading ? (
           <Loader />
         ) : (
@@ -211,7 +243,11 @@ const CustomerDashboard: React.FC = () => {
             <FormControl
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => setListShow(true)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setListShow(true);
+              }}
             />
             <InputGroup.Text
               onClick={clearSearch}
@@ -227,7 +263,8 @@ const CustomerDashboard: React.FC = () => {
           ) : (
             <ListGroup
               style={{
-                height: window.innerWidth <= 768 ? "30vh" : "100%",
+                height:
+                  window.innerWidth <= 768 ? (listShow ? "30vh" : "0") : "100%",
                 overflowY: "auto",
               }}
             >
