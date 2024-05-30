@@ -20,6 +20,9 @@ import {
   fetchInventory,
   updateSKUReplenishment,
   deleteSKUReplenishment,
+  addSkuInfo,
+  updateSkuInfo,
+  SKUInfoData
 } from "../services/api";
 
 import PieChartComponent from "../components/PieChartComponent";
@@ -27,7 +30,9 @@ import BarChartComponent from "../components/BarChartComponent";
 import Loader from "../components/Loader";
 import InventorySummary from "../components/InventorySummary";
 import useReplenishment, { ReplenishmentData } from "../hooks/useReplenishment";
+import useSkuInfo from "../hooks/useSkuInfo";
 import { validateThreshold } from "../validations/thresholdValidations";
+import { validateQtyPerPallet } from "../validations/qtyPerPalletValidations";
 
 const CustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();
@@ -39,24 +44,30 @@ const CustomerDashboard: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<string>(""); //selected SKU from the list
   const [SKUReplenishmentData, setSKUReplenishmentData] =
     useState<ReplenishmentData | null>(null); //replenishment data of selected SKU.
+  const [selectedSkuInfoData, setSelectedSkuInfoData] =
+    useState<SKUInfoData | null>(null); //Sku info data of selected SKU.
   const [searchTerm, setSearchTerm] = useState<string>(""); // Searching from list of SKUs
-  const [inputValue, setInputValue] = useState<string>(""); //Threshold value
-  const [errorMessage, setErrorMessage] = useState(""); //for input validation
+  const [thresholdFieldValue, setThresholdFieldValue] = useState<string>(""); //Threshold value
+  const [qtyPerPalletFieldValue, setQtyPerPalletFieldValue] = useState<string>(""); //QtyPerPallet value
+  const [errMsgThreshold, setErrMsgThreshold] = useState(""); //for Thereshold input validation
+  const [errMsgQtyPerPallet, setErrMsgQtyPerPallet] = useState(""); //for Qty per pallet input validation
   const [listShow, setListShow] = useState(true); //list on mobile view
   const [overviewShow, setOverviewShow] = useState(true); //overview on mobile view
 
   const { replenishmentData, isReplenishmentLoading, setReplenishmentData } =
     useReplenishment();
+  const { skuInfoData, isSkuInfoLoading, setSkuInfoData,fetchLatestSkuInfo } =
+  useSkuInfo();
 
   const navigate = useNavigate();
 
-  const validateAndFormatData = () => {
-    const validationError = validateThreshold(inputValue.toString());
+  const validateAndFormatReplenishmentData = () => {
+    const validationError = validateThreshold(thresholdFieldValue.toString());
     if (validationError) {
-      setErrorMessage(validationError);
+      setErrMsgThreshold(validationError);
       return null;
     } else {
-      setErrorMessage("");
+      setErrMsgThreshold("");
     }
 
     if (!selectedItem || !selectedCustomer) {
@@ -68,36 +79,91 @@ const CustomerDashboard: React.FC = () => {
       sku: selectedItem,
       clientId: selectedCustomer.customerId.toString(),
       clientName: selectedCustomer.companyName.toString(),
-      threshold: inputValue,
+      threshold: thresholdFieldValue,
+    };
+  };
+  const validateAndFormatSkuInfoData = () => {
+    const validationError = validateQtyPerPallet(qtyPerPalletFieldValue.toString());
+    if (validationError) {
+      setErrMsgQtyPerPallet(validationError);
+      return null;
+    } else {
+      setErrMsgQtyPerPallet("");
+    }
+
+    if (!selectedItem || !selectedCustomer) {
+      console.error("Error: Selected item or customer is null or undefined.");
+      return null;
+    }
+
+    return {
+      sku: selectedItem,
+      clientId: selectedCustomer.customerId.toString(),
+      clientName: selectedCustomer.companyName.toString(),
+      qtyPerPallet: qtyPerPalletFieldValue,
     };
   };
 
+
+
+
+const updateSkuInfoData = async () => {
+  // Retrieve current threshold for the selected item
+const currentSkuInfoItem = skuInfoData?.find((d) => d.sku === selectedItem);
+
+  // Check if qtyPerPalletFieldValue is the same as the current Qty per pallet
+  if (currentSkuInfoItem?.qtyPerPallet == qtyPerPalletFieldValue) {
+    toast.info("No changes detected in SKU Qty per pallet.");
+    return; // Exit if the current Qty per pallet is the same as the input value
+  }
+
+    await updateSkuInfo(selectedItem, qtyPerPalletFieldValue);
+    toast.success("SKU Qty per pallet updated successfully.");
+    setSkuInfoData(
+      (prevData) =>
+        prevData?.map((d) =>
+          d.sku === selectedItem ? { ...d, qtyPerPallet: qtyPerPalletFieldValue } : d,
+        ) || null,
+    );
+  
+};
+
+const addSkuInfoData = async (data: SKUInfoData) => {
+  await addSkuInfo(data);
+  toast.success("New SKU Qty per pallet added successfully.");
+  setSkuInfoData((prevData) =>
+    prevData ? [...prevData, data] : [data],
+  );
+  setSelectedSkuInfoData(data);
+};
+
   const updateReplenishmentData = async () => {
     // Retrieve current threshold for the selected item
-    const currentItem = replenishmentData?.find((d) => d.sku === selectedItem);
-
-    // Check if inputValue is the same as the current threshold
-    if (currentItem?.threshold === inputValue) {
+    const currentReplenishmentItem = replenishmentData?.find((d) => d.sku === selectedItem);
+console.log("afasfasdfadf", currentReplenishmentItem?.threshold)
+console.log("afasfasdfadf", thresholdFieldValue)
+    // Check if thresholdFieldValue is the same as the current threshold
+    if (currentReplenishmentItem?.threshold == thresholdFieldValue) {
       toast.info("No changes detected in SKU Threshold.");
       return; // Exit if the current threshold is the same as the input value
     }
 
-    // Proceed with deletion or update based on the inputValue
-    if (parseInt(inputValue) === 0) {
+    // Proceed with deletion or update based on the thresholdFieldValue
+    if (parseInt(thresholdFieldValue) === 0) {
       await deleteSKUReplenishment(selectedItem);
       toast.success("SKU Threshold deleted successfully.");
       setReplenishmentData(
         (prevData) => prevData?.filter((d) => d.sku !== selectedItem) || null,
       );
       setSKUReplenishmentData(null);
-      setInputValue("");
+      setThresholdFieldValue("");
     } else {
-      await updateSKUReplenishment(selectedItem, inputValue);
+      await updateSKUReplenishment(selectedItem, thresholdFieldValue);
       toast.success("SKU Threshold updated successfully.");
       setReplenishmentData(
         (prevData) =>
           prevData?.map((d) =>
-            d.sku === selectedItem ? { ...d, threshold: inputValue } : d,
+            d.sku === selectedItem ? { ...d, threshold: thresholdFieldValue } : d,
           ) || null,
       );
     }
@@ -113,7 +179,7 @@ const CustomerDashboard: React.FC = () => {
   };
 
   const handleThresholdButtonClick = async () => {
-    const data = validateAndFormatData();
+    const data = validateAndFormatReplenishmentData();
     if (!data) return;
 
     try {
@@ -127,19 +193,43 @@ const CustomerDashboard: React.FC = () => {
       toast.error("Error occurred");
     }
   };
+  const handleQtyPerPalletButtonClick = async () => {
+    const data = validateAndFormatSkuInfoData();
+    if (!data) return;
+
+    try {
+      if (selectedSkuInfoData) {
+        await updateSkuInfoData();
+      } else {
+        await addSkuInfoData(data);
+      }
+    } catch (error) {
+      console.error("Error occurred:", error);
+      toast.error("Error occurred");
+    }
+  };
 
   const handleSKUSelect = (item: string): void => {
     setListShow(false);
     setOverviewShow(false);
     setSelectedItem(item);
-    setErrorMessage("");
-    setInputValue("");
+    setErrMsgThreshold("");
+    setErrMsgQtyPerPallet("");
+    setThresholdFieldValue("");
+    setQtyPerPalletFieldValue("");
     if (replenishmentData) {
       const filteredSKUData: ReplenishmentData | null =
         replenishmentData.find((data) => data.sku === item) || null;
       setSKUReplenishmentData(filteredSKUData);
-      if (filteredSKUData) setInputValue(filteredSKUData?.threshold.toString());
+      if (filteredSKUData) setThresholdFieldValue(filteredSKUData?.threshold.toString());
       console.log(SKUReplenishmentData);
+    }
+    if (skuInfoData) {
+      const filteredSKUData2: SKUInfoData | null =
+        skuInfoData.find((data) => data.sku === item) || null;
+        setSelectedSkuInfoData(filteredSKUData2);
+      if (filteredSKUData2) setQtyPerPalletFieldValue(filteredSKUData2?.qtyPerPallet.toString());
+      console.log( skuInfoData);
     }
   };
 
@@ -148,6 +238,7 @@ const CustomerDashboard: React.FC = () => {
       startLoading();
       try {
         const data = await fetchInventory(selectedCustomer?.customerId);
+        await fetchLatestSkuInfo(selectedCustomer?.customerId.toString());
         setInventoryData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -357,16 +448,16 @@ const CustomerDashboard: React.FC = () => {
                           placeholder={
                             SKUReplenishmentData?.threshold
                               ? SKUReplenishmentData.threshold.toString()
-                              : "Enter a number"
+                              : "Enter threshold value"
                           }
                           aria-label="Item Threshold"
-                          value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          className={errorMessage ? "is-invalid" : ""}
+                          value={thresholdFieldValue}
+                          onChange={(e) => setThresholdFieldValue(e.target.value)}
+                          className={errMsgThreshold ? "is-invalid" : ""}
                         />
-                        {errorMessage && (
+                        {errMsgThreshold && (
                           <Form.Control.Feedback type="invalid">
-                            {errorMessage}
+                            {errMsgThreshold}
                           </Form.Control.Feedback>
                         )}
                         <Button
@@ -375,6 +466,49 @@ const CustomerDashboard: React.FC = () => {
                           onClick={handleThresholdButtonClick}
                         >
                           {SKUReplenishmentData ? "UPDATE" : "ADD"}
+                        </Button>
+                      </Form.Group>
+                    </Form>
+                  )}
+                </div>
+{/* //qtyPerPallet */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "20px",
+                  }}
+                >
+                  {isSkuInfoLoading ? (
+                    <div className="m-4">
+                      <Loader dims={50} />
+                    </div>
+                  ) : (
+                    <Form className="p-3">
+                      <Form.Group controlId="qtyPerPalletInput">
+                        <Form.Label>Qty per Pallet</Form.Label>
+                        <FormControl
+                          placeholder={
+                            selectedSkuInfoData?.qtyPerPallet
+                              ? selectedSkuInfoData.qtyPerPallet.toString()
+                              : "Enter Qty per pallet"
+                          }
+                          aria-label="Qty per pallet"
+                          value={qtyPerPalletFieldValue}
+                          onChange={(e) => setQtyPerPalletFieldValue(e.target.value)}
+                          className={errMsgQtyPerPallet ? "is-invalid" : ""}
+                        />
+                        {errMsgQtyPerPallet && (
+                          <Form.Control.Feedback type="invalid">
+                            {errMsgQtyPerPallet}
+                          </Form.Control.Feedback>
+                        )}
+                        <Button
+                          variant="primary"
+                          className="mt-2"
+                          onClick={handleQtyPerPalletButtonClick}
+                        >
+                          {selectedSkuInfoData ? "UPDATE" : "ADD"}
                         </Button>
                       </Form.Group>
                     </Form>

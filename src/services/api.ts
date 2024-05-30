@@ -1,6 +1,6 @@
 // api.js
 import axios from "axios";
-import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, REPLENISHMENT_URL } from "../constants";
+import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, REPLENISHMENT_URL, SKUINFO_URL } from "../constants";
 
 export interface CustomerData {
     customerId: number;
@@ -17,6 +17,13 @@ export interface CustomerData {
     qtyToReplenish?: number;
   }
   
+ export interface SKUInfoData {
+    sku: string;
+    clientId: string;
+    clientName: string;
+    qtyPerPallet: string;
+  }
+  
 
 
 export async function fetchCustomers() {
@@ -25,7 +32,7 @@ export async function fetchCustomers() {
       const response = await axios.get(BASE_URL + CUSTOMERS_URL);
       return response.data;
     } catch (error) {
-      console.error("Error fetching Customers data:", error);
+      console.error("Error fetching Customers data:",error);
       throw error;
     }
   }
@@ -48,6 +55,18 @@ export async function fetchThreshold() {
       return response.data;
     } catch (error) {
       console.error("Error fetching Threshold data:", error);
+      throw error;
+    }
+  }
+
+  export async function fetchAllSkuInfo() {
+    try {
+      console.log("FETCHING SKU INFO DATA")
+
+      const response = await axios.get(BASE_URL + SKUINFO_URL );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching QTY PER PALLET data:", error);
       throw error;
     }
   }
@@ -106,6 +125,50 @@ export async function fetchThreshold() {
       return response.data;
     } catch (error) {
       console.error("Error fetching Threshold data:", error);
+      throw error;
+    }
+  }
+
+
+  export const updateSkuInfo = async (sku: string, qtyPerPallet: string): Promise<void> => {
+    try {
+      const response = await axios.put(BASE_URL + SKUINFO_URL + `/${sku}`, { qtyPerPallet });
+  
+      if (response.status !== 200) {
+        throw new Error('Failed to update SKU info.');
+      }
+  
+      console.log('SKU info updated successfully.');
+    } catch (error) {
+
+      console.error('Error updating SKU info:', error);
+      throw error;
+    }
+  };
+  
+  export const addSkuInfo = async (data: SKUInfoData): Promise<void> => {
+    try {
+      const response = await axios.post(BASE_URL + SKUINFO_URL, data);
+  
+      if (response.status !== 201) {
+        throw new Error('Failed to add SKU info.');
+      }
+  
+      console.log('SKU info added successfully.');
+    } catch (error) {
+      console.error('Error adding SKU info:', error);
+      throw error;
+    }
+  };
+
+  export async function fetchSkuInfoByClientId(clientId: string) {
+    try {
+      console.log("FETCHING SKU Info DATA")
+
+      const response = await axios.get(BASE_URL + SKUINFO_URL + "/by-client-flagged/" + clientId);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching sku info data:", error);
       throw error;
     }
   }

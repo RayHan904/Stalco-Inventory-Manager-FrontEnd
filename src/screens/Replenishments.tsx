@@ -46,7 +46,7 @@ const Replenishments: React.FC = () => {
       <h1>Replenishments</h1>
       <div
         className="d-flex justify-content-center "
-        style={{ minHeight: innerWidth < 450 ? "50vh" : "60vh" }}
+        style={{ minHeight: innerWidth < 450 ? "50vh" : "65vh" }}
       >
         {isCustomersLoading ? (
           <Loader />

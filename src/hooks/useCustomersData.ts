@@ -17,7 +17,7 @@ const useCustomersData = () => {
                 setCustomersData(data);
             } catch (error: any) {  // 'any' type can be replaced with a more specific error type if available
                 console.error("Error fetching data:", error);
-                toast.error("Error fetching data");
+                toast.error("Unable to connect to API");
             } finally {
                 stopCustomersLoading();
             }
