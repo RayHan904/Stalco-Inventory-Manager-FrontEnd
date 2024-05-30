@@ -16,7 +16,7 @@ const InventorySummary: React.FC<{ summary: SummaryProps['summary'] }> = ({ summ
     return (
         <>
             <InfoCardComponent cardTitle="Total Inventory" text={total.toLocaleString()} />
-            <InfoCardComponent cardTitle="WHL Total" text={whlCount.toLocaleString()} perc={`${((whlCount / total) * 100).toFixed(2)}%`} />
+            <InfoCardComponent cardTitle="WHL Total" text={whlCount.toLocaleString()}  perc={`${((whlCount / total) * 100).toFixed(2)}%`} />
             <InfoCardComponent cardTitle="Clayson Total" text={claysonCount.toLocaleString()} perc={`${((claysonCount / total) * 100).toFixed(2)}%`} />
         </>
     );
