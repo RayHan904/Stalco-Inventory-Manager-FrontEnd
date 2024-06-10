@@ -8,8 +8,6 @@ import { SKUInfoData } from "../services/api";
 interface SKUDetailProps {
   selectedItem: string;
   details: { [key: string]: number };
-  claysonData: number;
-  whlData: number;
   thresholdFieldValue: string;
   qtyPerPalletFieldValue: string;
   errMsgThreshold: string;
@@ -27,8 +25,6 @@ interface SKUDetailProps {
 const SKUDetail: React.FC<SKUDetailProps> = ({
   selectedItem,
   details,
-  claysonData,
-  whlData,
   thresholdFieldValue,
   qtyPerPalletFieldValue,
   errMsgThreshold,
@@ -42,26 +38,40 @@ const SKUDetail: React.FC<SKUDetailProps> = ({
   onThresholdSubmit,
   onQtyPerPalletSubmit,
 }) => {
+
+
+    
+  let claysonData = 0;
+  let whlData = 0;
+  
   return (
     <div>
       <div className="mb-2" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
         <div>
           <h2>{selectedItem}</h2>
           <ListGroup>
-            {Object.entries(details).map(([key, value]) => (
-              <ListGroup.Item key={key}>
-                {key}: {typeof value === "number" ? value.toLocaleString() : value}
-              </ListGroup.Item>
-            ))}
-            <>
-              <ListGroup.Item>
-                Clayson's Percentage: {((claysonData / (claysonData + whlData)) * 100).toFixed(2)}%
-              </ListGroup.Item>
-              <ListGroup.Item>
-                WHL's Percentage: {((whlData / (claysonData + whlData)) * 100).toFixed(2)}%
-              </ListGroup.Item>
-            </>
-          </ListGroup>
+  {Object.entries(details).map(([key, value]) => {
+    if (key === "Clayson") {
+      claysonData = value;
+    } else {
+      whlData = value;
+    }
+    return (
+      <ListGroup.Item key={key}>
+        {key}: {typeof value === "number" ? value.toLocaleString() : value}
+      </ListGroup.Item>
+    );
+  })}
+  <>
+    <ListGroup.Item>
+      Clayson's Percentage: {((claysonData / (claysonData + whlData)) * 100).toFixed(2)}%
+    </ListGroup.Item>
+    <ListGroup.Item>
+      WHL's Percentage: {((whlData / (claysonData + whlData)) * 100).toFixed(2)}%
+    </ListGroup.Item>
+  </>
+</ListGroup>
+
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
           {isReplenishmentLoading ? (
