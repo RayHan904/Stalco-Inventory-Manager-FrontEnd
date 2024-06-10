@@ -8,7 +8,9 @@ interface SKUListProps {
   selectedItem: string;
   searchTerm: string;
   isLoading: boolean;
+  listShow: boolean;
   onSelect: (item: string) => void;
+  setListShow: (item: boolean) => void;
   onSearch: (term: string) => void;
   onClearSearch: () => void;
 }
@@ -18,6 +20,8 @@ const SKUList: React.FC<SKUListProps> = ({
   selectedItem,
   searchTerm,
   isLoading,
+  listShow,
+  setListShow,
   onSelect,
   onSearch,
   onClearSearch,
@@ -29,8 +33,11 @@ const SKUList: React.FC<SKUListProps> = ({
         <FormControl
           placeholder="Search..."
           value={searchTerm}
-          onFocus={() => onSearch(searchTerm)}
-          onChange={(e) => onSearch(e.target.value)}
+          onFocus={() => setListShow(true)}
+          onChange={(e) => {
+            onSearch(e.target.value);
+            setListShow(true);
+          }}
         />
         <InputGroup.Text onClick={onClearSearch} style={{ cursor: "pointer" }}>
           <BsX />
@@ -43,7 +50,7 @@ const SKUList: React.FC<SKUListProps> = ({
       ) : (
         <ListGroup
           style={{
-            height: window.innerWidth <= 768 ? "30vh" : "100%",
+            height: window.innerWidth <= 768 ? (listShow ? "30vh" : 0) : "100%",
             overflowY: "auto",
           }}
         >

@@ -299,6 +299,8 @@ const CustomerDashboard: React.FC = () => {
             searchTerm={searchTerm}
             isLoading={isLoading}
             onSelect={handleSKUSelect}
+            listShow={listShow}
+            setListShow={setListShow}
             onSearch={setSearchTerm}
             onClearSearch={clearSearch}
           />
