@@ -1,16 +1,12 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import Loader from "../components/Loader";
-import { useCustomers } from "../contexts/CustomerContext";
+import React, { useState, FormEvent } from "react";
 import { toast } from "react-toastify";
-import useReplenishment from "../hooks/useReplenishment";
 import { CustomerData } from "../services/api";
-import ReplenishmentTable from "../components/ReplenishmentTable";
+import { useCustomers } from "../contexts/CustomerContext";
+import useReplenishment from "../hooks/useReplenishment";
+import ReplenishmentInfo from "../components/ReplenishmentInfo";
 
 const Replenishments: React.FC = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(
-    null,
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
   const { customersData, isCustomersLoading } = useCustomers();
   const {
     replenishmentData,
@@ -19,11 +15,9 @@ const Replenishments: React.FC = () => {
     setReplenishmentData,
   } = useReplenishment();
 
-  const handleSelect = (event: ChangeEvent) => {
-    const target = event.target as HTMLSelectElement;
-    const selectedCustomerObject = JSON.parse(target.value);
+  const handleSelect = (customer: CustomerData) => {
     setReplenishmentData(null);
-    setSelectedCustomer(selectedCustomerObject);
+    setSelectedCustomer(customer);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -42,92 +36,15 @@ const Replenishments: React.FC = () => {
   };
 
   return (
-    <Container fluid="md" className="text-center my-4">
-      <h1>Replenishments</h1>
-      <div
-        className="d-flex justify-content-center "
-        style={{ minHeight: innerWidth < 450 ? "50vh" : "65vh" }}
-      >
-        {isCustomersLoading ? (
-          <Loader />
-        ) : (
-          <Container>
-            <Form onSubmit={handleSubmit}>
-              <Row className="justify-content-center mb-3">
-                <Col md={6} className="mb-2">
-                  <Form.Group controlId="selectCustomer">
-                    <Form.Control
-                      as="select"
-                      onChange={handleSelect}
-                      defaultValue=""
-                    >
-                      <option disabled value="">
-                        Select a Customer...
-                      </option>
-                      {/* <option value="All">
-                                                All
-                                            </option> */}
-                      {customersData?.map((customer) => (
-                        <option
-                          key={customer.customerId}
-                          value={JSON.stringify(customer)}
-                        >
-                          {customer.companyName}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
-                <Col md="auto">
-                  <Button className="" variant="primary" type="submit">
-                    Select
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-
-            {isReplenishmentLoading ? (
-              <Loader />
-            ) : selectedCustomer &&
-              replenishmentData &&
-              replenishmentData.length > 0 ? (
-              <ReplenishmentTable replenishmentData={replenishmentData} />
-            ) : (
-              <div className="text-center mt-4">
-                <h2>
-                  {selectedCustomer && replenishmentData?.length == 0
-                    ? "No Replenishments to show"
-                    : ""}
-                </h2>
-              </div>
-            )}
-          </Container>
-        )}
-      </div>
-      <div
-        style={{
-          height: "90%",
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
-        }}
-      >
-        <Form.Group
-          id="automatedMailingList"
-          className="m-4 "
-          style={{ height: "50px", width: "60%" }}
-        >
-          <Form.Label>Automated mailing list:</Form.Label>
-          <Form.Control
-            type="email"
-            value="inventory@stalco.ca"
-            disabled
-            className="disabled-input"
-          />
-          <small className="text-muted">you are not authorized</small>
-        </Form.Group>
-      </div>
-    </Container>
+    <ReplenishmentInfo
+      selectedCustomer={selectedCustomer}
+      customersData={customersData}
+      isCustomersLoading={isCustomersLoading}
+      isReplenishmentLoading={isReplenishmentLoading}
+      replenishmentData={replenishmentData}
+      onCustomerSelect={handleSelect}
+      onFormSubmit={handleSubmit}
+    />
   );
 };
 
