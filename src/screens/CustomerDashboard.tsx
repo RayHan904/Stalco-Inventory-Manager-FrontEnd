@@ -28,26 +28,27 @@ import BarChartComponent from "../components/BarChartComponent";
 
 const CustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();
-  const { isLoading, startLoading, stopLoading } = useLoading();
-  const [inventoryData, setInventoryData] = useState<{
-    summary: { [key: string]: number };
-    detail: { [key: string]: { [key: string]: number } };
-  } | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string>(""); //selected SKU from the list
-  const [SKUReplenishmentData, setSKUReplenishmentData] =
-    useState<ReplenishmentData | null>(null); //replenishment data of selected SKU.
-  const [selectedSkuInfoData, setSelectedSkuInfoData] =
-    useState<SKUInfoData | null>(null); //Sku info data of selected SKU.
+
+  const { isLoading, startLoading, stopLoading } = useLoading(); //while loading inventoryData
+  const { replenishmentData, isReplenishmentLoading, setReplenishmentData } = useReplenishment(); //fetching data from Replenishment Collection
+  const { skuInfoData, isSkuInfoLoading, setSkuInfoData, fetchLatestSkuInfo } = useSkuInfo(); //fetching data from SkuInfo Collection
+
+  const [inventoryData, setInventoryData] = useState<{ summary: { [key: string]: number }; detail: { [key: string]: { [key: string]: number } };} | null>(null); //All the inventory Data is stored here
+  const [SKUReplenishmentData, setSKUReplenishmentData] = useState<ReplenishmentData | null>(null); //replenishment data of selected SKU.
+  const [selectedSkuInfoData, setSelectedSkuInfoData] = useState<SKUInfoData | null>(null); //Sku info data of selected SKU.
+
   const [searchTerm, setSearchTerm] = useState<string>(""); // Searching from list of SKUs
+  const [selectedItem, setSelectedItem] = useState<string>(""); //selected SKU from the list
+
   const [thresholdFieldValue, setThresholdFieldValue] = useState<string>(""); //Threshold value
   const [qtyPerPalletFieldValue, setQtyPerPalletFieldValue] = useState<string>(""); //QtyPerPallet value
   const [errMsgThreshold, setErrMsgThreshold] = useState(""); //for Thereshold input validation
   const [errMsgQtyPerPallet, setErrMsgQtyPerPallet] = useState(""); //for Qty per pallet input validation
+
   const [listShow, setListShow] = useState(true); //list on mobile view
   const [overviewShow, setOverviewShow] = useState(true); //overview on mobile view
 
-  const { replenishmentData, isReplenishmentLoading, setReplenishmentData } = useReplenishment();
-  const { skuInfoData, isSkuInfoLoading, setSkuInfoData, fetchLatestSkuInfo } = useSkuInfo();
+
 
   const navigate = useNavigate();
 
@@ -95,65 +96,77 @@ const CustomerDashboard: React.FC = () => {
     };
   };
 
+
   const updateSkuInfoData = async () => {
-    const currentSkuInfoItem = skuInfoData?.find((d) => d.sku === selectedItem);
-
-    if (currentSkuInfoItem?.qtyPerPallet === qtyPerPalletFieldValue) {
+    // Retrieve current threshold for the selected item
+  const currentSkuInfoItem = skuInfoData?.find((d) => d.sku === selectedItem);
+  
+    // Check if qtyPerPalletFieldValue is the same as the current Qty per pallet
+    if (currentSkuInfoItem?.qtyPerPallet == qtyPerPalletFieldValue) {
       toast.info("No changes detected in SKU Qty per pallet.");
-      return;
+      return; // Exit if the current Qty per pallet is the same as the input value
     }
-
-    await updateSkuInfo(selectedItem, qtyPerPalletFieldValue);
-    toast.success("SKU Qty per pallet updated successfully.");
-    setSkuInfoData(
-      (prevData) =>
-        prevData?.map((d) =>
-          d.sku === selectedItem ? { ...d, qtyPerPallet: qtyPerPalletFieldValue } : d,
-        ) || null,
-    );
+  
+      await updateSkuInfo(selectedItem, qtyPerPalletFieldValue);
+      toast.success("SKU Qty per pallet updated successfully.");
+      setSkuInfoData(
+        (prevData) =>
+          prevData?.map((d) =>
+            d.sku === selectedItem ? { ...d, qtyPerPallet: qtyPerPalletFieldValue } : d,
+          ) || null,
+      );
+    
   };
-
+  
   const addSkuInfoData = async (data: SKUInfoData) => {
     await addSkuInfo(data);
     toast.success("New SKU Qty per pallet added successfully.");
-    setSkuInfoData((prevData) => (prevData ? [...prevData, data] : [data]));
+    setSkuInfoData((prevData) =>
+      prevData ? [...prevData, data] : [data],
+    );
     setSelectedSkuInfoData(data);
   };
-
-  const updateReplenishmentData = async () => {
-    const currentReplenishmentItem = replenishmentData?.find((d) => d.sku === selectedItem);
-
-    if (currentReplenishmentItem?.threshold === thresholdFieldValue) {
-      toast.info("No changes detected in SKU Threshold.");
-      return;
-    }
-
-    if (parseInt(thresholdFieldValue) === 0) {
-      await deleteSKUReplenishment(selectedItem);
-      toast.success("SKU Threshold deleted successfully.");
-      setReplenishmentData((prevData) => prevData?.filter((d) => d.sku !== selectedItem) || null);
-      setSKUReplenishmentData(null);
-      setThresholdFieldValue("");
-    } else {
-      await updateSKUReplenishment(selectedItem, thresholdFieldValue);
-      toast.success("SKU Threshold updated successfully.");
-      setReplenishmentData(
-        (prevData) =>
-          prevData?.map((d) =>
-            d.sku === selectedItem ? { ...d, threshold: thresholdFieldValue } : d,
-          ) || null,
+  
+    const updateReplenishmentData = async () => {
+      // Retrieve current threshold for the selected item
+      const currentReplenishmentItem = replenishmentData?.find((d) => d.sku === selectedItem);
+  console.log("afasfasdfadf", currentReplenishmentItem?.threshold)
+  console.log("afasfasdfadf", thresholdFieldValue)
+      // Check if thresholdFieldValue is the same as the current threshold
+      if (currentReplenishmentItem?.threshold == thresholdFieldValue) {
+        toast.info("No changes detected in SKU Threshold.");
+        return; // Exit if the current threshold is the same as the input value
+      }
+  
+      // Proceed with deletion or update based on the thresholdFieldValue
+      if (parseInt(thresholdFieldValue) === 0) {
+        await deleteSKUReplenishment(selectedItem);
+        toast.success("SKU Threshold deleted successfully.");
+        setReplenishmentData(
+          (prevData) => prevData?.filter((d) => d.sku !== selectedItem) || null,
+        );
+        setSKUReplenishmentData(null);
+        setThresholdFieldValue("");
+      } else {
+        await updateSKUReplenishment(selectedItem, thresholdFieldValue);
+        toast.success("SKU Threshold updated successfully.");
+        setReplenishmentData(
+          (prevData) =>
+            prevData?.map((d) =>
+              d.sku === selectedItem ? { ...d, threshold: thresholdFieldValue } : d,
+            ) || null,
+        );
+      }
+    };
+  
+    const addReplenishmentData = async (data: ReplenishmentData) => {
+      await addSKUReplenishment(data);
+      toast.success("New SKU Threshold added successfully.");
+      setReplenishmentData((prevData) =>
+        prevData ? [...prevData, data] : [data],
       );
-    }
-  };
-
-  const addReplenishmentData = async (data: ReplenishmentData) => {
-    await addSKUReplenishment(data);
-    toast.success("New SKU Threshold added successfully.");
-    setReplenishmentData((prevData) => (prevData ? [...prevData, data] : [data]));
-    setSKUReplenishmentData(data);
-  };
-
-
+      setSKUReplenishmentData(data);
+    };
   const handleThresholdButtonClick = async () => {
     const data = validateAndFormatReplenishmentData();
     if (!data) return;
@@ -237,9 +250,6 @@ const CustomerDashboard: React.FC = () => {
   const claysonCount = summary.Clayson || 0;
   const whlCount = summary.WHL || 0;
 
-  let claysonData = 0;
-  let whlData = 0;
-
   const barChartData = {
     data: [claysonCount, whlCount],
   };
@@ -300,8 +310,6 @@ const CustomerDashboard: React.FC = () => {
               <SKUDetail
                 selectedItem={selectedItem}
                 details={details[selectedItem] || {}}
-                claysonData={claysonData}
-                whlData={whlData}
                 thresholdFieldValue={thresholdFieldValue}
                 qtyPerPalletFieldValue={qtyPerPalletFieldValue}
                 errMsgThreshold={errMsgThreshold}

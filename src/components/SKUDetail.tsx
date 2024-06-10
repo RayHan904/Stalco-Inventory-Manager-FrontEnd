@@ -1,9 +1,10 @@
 import React from "react";
-import { ListGroup, Form, FormControl, Button } from "react-bootstrap";
+import { ListGroup } from "react-bootstrap";
 import Loader from "./Loader";
 import PieChartComponent from "./PieChartComponent";
 import { ReplenishmentData } from "../hooks/useReplenishment";
 import { SKUInfoData } from "../services/api";
+import SKUDetailForm from "./SKUDetailForm";
 
 interface SKUDetailProps {
   selectedItem: string;
@@ -79,24 +80,15 @@ const SKUDetail: React.FC<SKUDetailProps> = ({
               <Loader dims={50} />
             </div>
           ) : (
-            <Form className="p-3">
-              <Form.Group controlId="thresholdInput">
-                <Form.Label>Threshold</Form.Label>
-                <FormControl
-                  placeholder={SKUReplenishmentData?.threshold?.toString() || "Enter threshold value"}
-                  aria-label="Item Threshold"
-                  value={thresholdFieldValue}
-                  onChange={(e) => onThresholdChange(e.target.value)}
-                  className={errMsgThreshold ? "is-invalid" : ""}
-                />
-                {errMsgThreshold && (
-                  <Form.Control.Feedback type="invalid">{errMsgThreshold}</Form.Control.Feedback>
-                )}
-                <Button variant="primary" className="mt-2" onClick={onThresholdSubmit}>
-                  {SKUReplenishmentData ? "UPDATE" : "ADD"}
-                </Button>
-              </Form.Group>
-            </Form>
+            <SKUDetailForm
+              label="Threshold"
+              placeholder="Enter threshold value"
+              value={thresholdFieldValue}
+              errorMessage={errMsgThreshold}
+              onChange={onThresholdChange}
+              onSubmit={onThresholdSubmit}
+              buttonText={SKUReplenishmentData ? "UPDATE" : "ADD"}
+            />
           )}
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
@@ -105,24 +97,15 @@ const SKUDetail: React.FC<SKUDetailProps> = ({
               <Loader dims={50} />
             </div>
           ) : (
-            <Form className="p-3">
-              <Form.Group controlId="qtyPerPalletInput">
-                <Form.Label>Qty per Pallet</Form.Label>
-                <FormControl
-                  placeholder={selectedSkuInfoData?.qtyPerPallet?.toString() || "Enter Qty per pallet"}
-                  aria-label="Qty per pallet"
-                  value={qtyPerPalletFieldValue}
-                  onChange={(e) => onQtyPerPalletChange(e.target.value)}
-                  className={errMsgQtyPerPallet ? "is-invalid" : ""}
-                />
-                {errMsgQtyPerPallet && (
-                  <Form.Control.Feedback type="invalid">{errMsgQtyPerPallet}</Form.Control.Feedback>
-                )}
-                <Button variant="primary" className="mt-2" onClick={onQtyPerPalletSubmit}>
-                  {selectedSkuInfoData ? "UPDATE" : "ADD"}
-                </Button>
-              </Form.Group>
-            </Form>
+            <SKUDetailForm
+            label="Qty per Pallet"
+            placeholder="Enter Qty per pallet"
+            value={qtyPerPalletFieldValue}
+            errorMessage={errMsgQtyPerPallet}
+            onChange={onQtyPerPalletChange}
+            onSubmit={onQtyPerPalletSubmit}
+            buttonText={selectedSkuInfoData ? "UPDATE" : "ADD"}
+          />
           )}
         </div>
       </div>
