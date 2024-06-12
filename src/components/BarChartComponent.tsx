@@ -56,7 +56,7 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData> }> = ({
     ],
   };
 
-  return <Bar data={chartData} />;
+  return <Bar  style={{  margin:'0 auto'}} data={chartData} />;
 };
 
 export default BarChartComponent;
