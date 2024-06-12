@@ -101,3 +101,17 @@ main {
 .arrow-icon:active {
   color: #0d6efd;
 }
+
+
+.inline-checkbox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Add this to your CSS file (e.g., App.css) */
+.sub-row {
+  margin-bottom: 15px; /* Adjust the value as needed */
+}
+
+

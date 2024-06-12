@@ -1,0 +1,35 @@
+.calendar-popup {
+    position: absolute;
+    z-index: 1000;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .select-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .horizontal-line {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .calendar-popup {
+      width: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  
+    .select-button-container {
+      justify-content: center;
+    }
+  }
+  

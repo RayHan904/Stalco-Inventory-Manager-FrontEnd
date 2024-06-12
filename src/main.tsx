@@ -11,6 +11,7 @@ import CustomerDashboard from "./screens/CustomerDashboard";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import Replenishments from "./screens/Replenishments";
 import { CustomersProvider } from "./contexts/CustomerContext";
+import OrdersDashboard from "./screens/OrdersDashboard";
 
 const rootElement = document.getElementById("root");
 
@@ -27,6 +28,8 @@ const router = (
       <Route path="/" element={<App />}>
         <Route index path="/" element={<Home />} />
         <Route path="/replenishments" element={<Replenishments />} />
+        <Route path="/ordersDashboard" element={<OrdersDashboard />} />
+        {/* <Route path="/orders/:customerName" element={<CustomerDashboard />} />  */}
         <Route path="/Dashboard/:customerName" element={<CustomerDashboard />} /> 
         <Route path="*" element={<NotFound />} />
       </Route>
