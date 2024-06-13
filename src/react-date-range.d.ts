@@ -11,6 +11,12 @@ declare module 'react-date-range' {
       showDateDisplay?: boolean;
     }
   
+    export interface StaticRange {
+      label: string;
+      range: () => DateRange;
+      isSelected?: (range: DateRange) => boolean;
+    }
+  
     export interface DateRangePickerProps {
       ranges: DateRange[];
       onChange: (ranges: { [key: string]: DateRange }) => void;
@@ -31,8 +37,8 @@ declare module 'react-date-range' {
       disabledDates?: Date[];
       disabledDay?: (date: Date) => boolean;
       renderStaticRangeLabel?: (range: DateRange) => React.ReactNode;
-      inputRanges?: DateRange[];
-      staticRanges?: DateRange[];
+      inputRanges?: any[];
+      staticRanges?: StaticRange[];
     }
   
     export class DateRangePicker extends React.Component<DateRangePickerProps, any> {}

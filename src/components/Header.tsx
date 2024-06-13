@@ -29,6 +29,9 @@ const Header: React.FC = () => {
               <NavLink to="/replenishments" className={setActiveLink}>
                 Replenishment
               </NavLink>
+              <NavLink to="/ordersDashboard" className={setActiveLink}>
+                Orders
+              </NavLink>
             </Nav>
           </Navbar.Collapse>
         </Container>

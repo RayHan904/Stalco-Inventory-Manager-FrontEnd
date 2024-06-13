@@ -8,6 +8,8 @@ import { addDays } from 'date-fns';
 import CheckboxOption from './CheckboxOption'; // Import the custom option component
 import MultiValue from './MultiValue'; // Import the custom MultiValue component
 import MyDateRangePicker from './DateRangePicker';
+import StackedBarChartComponent from './StackedBarChartComponent';
+import LineChartComponent from './LineChartComponent';
 
 const OrdersDashboardComponent: React.FC = () => {
     const [selectedCustomerNames, setSelectedCustomerNames] = useState<any[]>([]);
@@ -22,6 +24,97 @@ const OrdersDashboardComponent: React.FC = () => {
         },
     ]);
 
+    // const dynamicData = {
+    //     labels: [
+    //       '2024-06-1', '2024-06-2', '2024-06-3', '2024-06-4', '2024-06-5', '2024-06-6', '2024-06-7', '2024-06-8', '2024-06-9', '2024-06-10',
+    //       '2024-06-11', '2024-06-12', '2024-06-13', '2024-06-14', '2024-06-15', '2024-06-16', '2024-06-17', '2024-06-18', '2024-06-19', '2024-06-20',
+    //       '2024-06-21', '2024-06-22', '2024-06-23', '2024-06-24', '2024-06-25', '2024-06-26', '2024-06-27', '2024-06-28', '2024-06-29', '2024-06-30'
+    //     ],
+    //     datasets: [
+    //       {
+    //         label: "# of units (US)",
+    //         data: [
+    //           10, 20, 30, 40, 50, 90, 45, 60, 70, 80,
+    //           15, 25, 35, 45, 55, 95, 50, 65, 75, 85,
+    //           12, 22, 32, 42, 52, 92, 47, 67, 77, 87
+    //         ],
+    //         backgroundColor: '#FF6384',
+    //         hoverBackgroundColor: '#d35671',
+    //         borderWidth: 1,
+    //       },
+    //       {
+    //         label: "# of units (CA)",
+    //         data: [
+    //           20, 30, 40, 50, 200, 100, 25, 70, 80, 90,
+    //           30, 40, 50, 60, 210, 110, 30, 75, 85, 95,
+    //           25, 35, 45, 55, 205, 105, 27, 72, 82, 92
+    //         ],
+    //         backgroundColor: '#36A2EB',
+    //         hoverBackgroundColor: '#2d8ccd',
+    //         borderWidth: 1,
+    //       },
+    //       {
+    //         label: "# of units (INTL)",
+    //         data: [
+    //           30, 40, 50, 60, 100, 150, 22, 80, 90, 100,
+    //           40, 50, 60, 70, 110, 160, 32, 85, 95, 105,
+    //           35, 45, 55, 65, 105, 155, 27, 87, 97, 107
+    //         ],
+    //         backgroundColor: '#FFCE56',
+    //         hoverBackgroundColor: '#e6b453',
+    //         borderWidth: 1,
+    //       },
+    //       {
+    //         label: "# of units (Internal)",
+    //         data: [
+    //           40, 50, 60, 70, 0, 34, 98, 90, 100, 110,
+    //           50, 60, 70, 80, 10, 44, 108, 95, 105, 115,
+    //           45, 55, 65, 75, 5, 39, 103, 97, 107, 117
+    //         ],
+    //         backgroundColor: '#4BC0C0',
+    //         hoverBackgroundColor: '#3ba3a3',
+    //         borderWidth: 1,
+    //       }
+    //     ],
+    //   };
+      
+      const dynamicData = {
+        labels: Array.from({ length: 300 }, (_, index) => `Q${index + 1}`),
+        datasets: [
+          {
+            label: "# of units (US)",
+            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 10),
+            backgroundColor: '#FF6384',
+            hoverBackgroundColor: '#d35671',
+            borderWidth: 1,
+          },
+          {
+            label: "# of units (CA)",
+            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 5),
+            backgroundColor: '#36A2EB',
+            hoverBackgroundColor: '#2d8ccd',
+            borderWidth: 1,
+          },
+          {
+            label: "# of units (INTL)",
+            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 3),
+            backgroundColor: '#FFCE56',
+            hoverBackgroundColor: '#e6b453',
+            borderWidth: 1,
+          },
+          {
+            label: "# of units (Internal)",
+            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 2),
+            backgroundColor: '#4BC0C0',
+            hoverBackgroundColor: '#3ba3a3',
+            borderWidth: 1,
+          }
+        ],
+      };
+      
+      // Example output of dynamicData for visualization:
+      console.log(dynamicData);
+      
     const customerNamesOptions = [
         { value: 'Biovation Labs, LLC', label: 'Biovation Labs, LLC' },
         { value: 'CK', label: 'Cuddle And Kind' },
@@ -166,8 +259,8 @@ const OrdersDashboardComponent: React.FC = () => {
                     </Row>
                 </Col>
                 <Col md={9}>
-                    <h1>Chart Component</h1>
-                    {/* Add your chart component here */}
+                {/* <StackedBarChartComponent stackedBarChart={dynamicData} /> */}
+                <LineChartComponent lineChart={dynamicData} />
                 </Col>
             </Row>
         </Container>
