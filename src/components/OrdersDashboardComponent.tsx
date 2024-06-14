@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { addDays } from 'date-fns';
@@ -10,6 +9,7 @@ import MultiValue from './MultiValue'; // Import the custom MultiValue component
 import MyDateRangePicker from './DateRangePicker';
 import StackedBarChartComponent from './StackedBarChartComponent';
 import LineChartComponent from './LineChartComponent';
+// import MapChart from './MapChart';
 
 const OrdersDashboardComponent: React.FC = () => {
     const [selectedCustomerNames, setSelectedCustomerNames] = useState<any[]>([]);
@@ -78,39 +78,47 @@ const OrdersDashboardComponent: React.FC = () => {
     //     ],
     //   };
       
+    const getRandomValue = () => Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+
       const dynamicData = {
-        labels: Array.from({ length: 300 }, (_, index) => `Q${index + 1}`),
+        labels: Array.from({ length: 100 }, (_, index) => `Q${index + 1}`),
         datasets: [
           {
             label: "# of units (US)",
-            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 10),
+            data: Array.from({ length: 100 }, () => getRandomValue()),
             backgroundColor: '#FF6384',
             hoverBackgroundColor: '#d35671',
-            borderWidth: 1,
+            borderWidth: 3,
           },
           {
             label: "# of units (CA)",
-            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 5),
+            data: Array.from({ length: 100 }, () => getRandomValue()),
             backgroundColor: '#36A2EB',
             hoverBackgroundColor: '#2d8ccd',
-            borderWidth: 1,
+            borderWidth: 3,
           },
           {
             label: "# of units (INTL)",
-            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 3),
+            data: Array.from({ length: 100 }, (_, index) => (index + 1) * 7),
             backgroundColor: '#FFCE56',
             hoverBackgroundColor: '#e6b453',
-            borderWidth: 1,
+            borderWidth: 3,
           },
           {
             label: "# of units (Internal)",
-            data: Array.from({ length: 300 }, (_, index) => (index + 1) * 2),
+            data: Array.from({ length: 100 }, () => getRandomValue()),
             backgroundColor: '#4BC0C0',
             hoverBackgroundColor: '#3ba3a3',
-            borderWidth: 1,
+            borderWidth: 3,
           }
         ],
       };
+      const mapData = [
+        { id: "California", value: 100 },
+        { id: "New York", value: 75 },
+        { id: "Texas", value: 50 },
+        // Add more states/provinces
+      ];
       
       // Example output of dynamicData for visualization:
       console.log(dynamicData);
@@ -259,8 +267,15 @@ const OrdersDashboardComponent: React.FC = () => {
                     </Row>
                 </Col>
                 <Col md={9}>
-                {/* <StackedBarChartComponent stackedBarChart={dynamicData} /> */}
-                <LineChartComponent lineChart={dynamicData} />
+             
+                    {dynamicData.labels.length >= 45 ?  <LineChartComponent lineChart={dynamicData} /> : <StackedBarChartComponent stackedBarChart={dynamicData} />}
+               
+                </Col>
+            </Row>
+            <hr/>
+            <Row>
+                <Col>
+                {/* <MapChart  /> */}
                 </Col>
             </Row>
         </Container>

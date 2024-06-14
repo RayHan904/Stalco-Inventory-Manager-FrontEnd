@@ -24,6 +24,7 @@ interface StackedBarChart {
     borderWidth?: number;
     borderColor?: string;
     fill?: boolean;
+    pointRadius?: number;
   }[];
 }
 
@@ -34,29 +35,33 @@ const defaultStackedBarChart: StackedBarChart = {
       label: "# of units (Dataset 1)",
       data: [0, 0, 0, 0],
       borderColor: '#FF6384',
-      borderWidth: 1,
+      borderWidth: 2, // Increase line thickness
       fill: false,
+      pointRadius: 0, // Hide points
     },
     {
       label: "# of units (Dataset 2)",
       data: [0, 0, 0, 0],
       borderColor: '#36A2EB',
-      borderWidth: 1,
+      borderWidth: 2, // Increase line thickness
       fill: false,
+      pointRadius: 0, // Hide points
     },
     {
       label: "# of units (Dataset 3)",
       data: [0, 0, 0, 0],
       borderColor: '#FFCE56',
-      borderWidth: 1,
+      borderWidth: 2, // Increase line thickness
       fill: false,
+      pointRadius: 0, // Hide points
     },
     {
       label: "# of units (Dataset 4)",
       data: [0, 0, 0, 0],
       borderColor: '#4BC0C0',
-      borderWidth: 1,
+      borderWidth: 2, // Increase line thickness
       fill: false,
+      pointRadius: 0, // Hide points
     }
   ],
 };
@@ -76,8 +81,13 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
       hoverBackgroundColor: undefined, // Remove hoverBackgroundColor for line chart
       borderColor: dataset.borderColor || defaultStackedBarChart.datasets[index].borderColor, // Use borderColor for line chart
       fill: false,
+      pointRadius: 0, // Hide points
+      borderWidth: dataset.borderWidth || 2, // Ensure the increased thickness
     })),
   };
+
+  const maxDataValue = Math.max(...datasets.flatMap(dataset => dataset.data));
+  const suggestedMax = maxDataValue > 8000 ? maxDataValue + 2000 : 8000;
 
   const options = {
     plugins: {
@@ -91,10 +101,12 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
     },
     responsive: true,
     scales: {
-      x: {
-        display: true,
-      },
       y: {
+        display: true,
+        min: 0, // Set minimum value for Y-axis
+        max: suggestedMax, // Set dynamic maximum value for Y-axis
+      },
+      x: {
         display: true,
       },
     },
