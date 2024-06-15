@@ -1,7 +1,7 @@
 import React from "react";
 import { ListGroup, InputGroup, FormControl } from "react-bootstrap";
 import { BsX } from "react-icons/bs";
-import Loader from "./Loader";
+import Loader from "../layout/Loader";
 
 interface SKUListProps {
   items: string[];

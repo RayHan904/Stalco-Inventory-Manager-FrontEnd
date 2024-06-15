@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { Form } from "react-bootstrap";
-import { CustomerData } from "../services/api";
+import { CustomerData } from "../../services/api";
 
 interface CustomerSelectProps {
   customers: CustomerData[] | null;

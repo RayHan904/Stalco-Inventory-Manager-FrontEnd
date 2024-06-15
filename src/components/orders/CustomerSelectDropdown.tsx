@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import { Button, ButtonGroup, Dropdown, Form } from "react-bootstrap";
-import { CustomerData } from "../services/api";
+import { CustomerData } from "../../services/api";
 
 interface CheckboxMenuProps {
   children: React.ReactNode;

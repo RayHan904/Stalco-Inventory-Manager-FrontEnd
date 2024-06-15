@@ -4,14 +4,14 @@ import { Col, Container, Form, Row, Button } from "react-bootstrap";
 import { useSelectedCustomer } from "../contexts/SelectedCustomerContext";
 import { useCustomers } from "../contexts/CustomerContext";
 import { toast } from "react-toastify";
-import Loader from "../components/Loader";
-import CustomerSelect from "../components/CustomerSelect";
+import Loader from "../components/layout/Loader";
+import CustomerSelect from "../components/common/CustomerSelect";
 import { CustomerData } from "../services/api";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import useLoading from "../hooks/useLoading";
-import InventorySummary from "../components/InventorySummary";
-import DoubleBarChartComponent from "../components/DoubleBarChartComponent";
-import UtilizationSummary from "../components/UtilizationSummary";
+import InventorySummary from "../components/inventory/InventorySummary";
+import DoubleBarChartComponent from "../components/charts/DoubleBarChartComponent";
+import UtilizationSummary from "../components/inventory/UtilizationSummary";
 
 const Home: React.FC = () => {
   const { selectedCustomer, setSelectedCustomer } = useSelectedCustomer();

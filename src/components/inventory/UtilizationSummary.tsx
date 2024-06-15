@@ -1,5 +1,5 @@
 import React from 'react';
-import InfoCardComponent from '../components/InfoCardComponent';
+import InfoCardComponent from '../common/InfoCardComponent';
 
 interface SummaryProps {
     summary: {

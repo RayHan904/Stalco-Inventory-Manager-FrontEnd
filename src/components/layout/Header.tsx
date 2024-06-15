@@ -1,7 +1,7 @@
 import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import logo from "../assets/stalco logo.png";
+import logo from "../../assets/stalco logo.png";
 
 const Header: React.FC = () => {
   const setActiveLink = ({ isActive }: { isActive: boolean }): string =>

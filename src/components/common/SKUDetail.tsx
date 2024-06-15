@@ -1,9 +1,9 @@
 import React from "react";
 import { ListGroup } from "react-bootstrap";
-import Loader from "./Loader";
-import PieChartComponent from "./PieChartComponent";
-import { ReplenishmentData } from "../hooks/useReplenishment";
-import { SKUInfoData } from "../services/api";
+import Loader from "../layout/Loader";
+import PieChartComponent from "../charts/PieChartComponent";
+import { ReplenishmentData } from "../../hooks/useReplenishment";
+import { SKUInfoData } from "../../services/api";
 import SKUDetailForm from "./SKUDetailForm";
 
 interface SKUDetailProps {

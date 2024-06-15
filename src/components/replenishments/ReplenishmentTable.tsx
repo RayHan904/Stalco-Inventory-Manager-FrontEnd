@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
-import { ReplenishmentData } from '../hooks/useReplenishment';
+import { ReplenishmentData } from '../../hooks/useReplenishment';
 
 
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
-import { CustomerData } from "../services/api";
-import Loader from "../components/Loader";
-import ReplenishmentTable from "../components/ReplenishmentTable";
-import CustomerSelect from "./CustomerSelect";
-import { ReplenishmentData } from "../hooks/useReplenishment";
+import { CustomerData } from "../../services/api";
+import Loader from "../layout/Loader";
+import ReplenishmentTable from "./ReplenishmentTable";
+import CustomerSelect from "../common/CustomerSelect";
+import { ReplenishmentData } from "../../hooks/useReplenishment";
 
 interface ReplenishmentInfoProps {
   selectedCustomer: CustomerData | null;

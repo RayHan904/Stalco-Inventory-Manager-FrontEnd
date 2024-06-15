@@ -4,12 +4,12 @@ import { Col, Container, Form, Row, Button } from "react-bootstrap";
 import { useSelectedCustomer } from "../contexts/SelectedCustomerContext";
 import { useCustomers } from "../contexts/CustomerContext";
 import { toast } from "react-toastify";
-import Loader from "../components/Loader";
-import CustomerSelect from "../components/CustomerSelect";
+import Loader from "../components/layout/Loader";
+import CustomerSelect from "../components/common/CustomerSelect";
 import { CustomerData } from "../services/api";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import useLoading from "../hooks/useLoading";
-import OrdersDashboardComponent from "../components/OrdersDashboardComponent";
+import OrdersDashboardComponent from "../components/orders/OrdersDashboardComponent";
 
 const OrdersDashboard: React.FC = () => {
   const { selectedCustomer, setSelectedCustomer } = useSelectedCustomer();

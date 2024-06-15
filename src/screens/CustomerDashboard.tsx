@@ -16,15 +16,15 @@ import {
   SKUInfoData
 } from "../services/api";
 
-import Loader from "../components/Loader";
-import InventorySummary from "../components/InventorySummary";
-import SKUList from "../components/SKUList";
-import SKUDetail from "../components/SKUDetail";
+import Loader from "../components/layout/Loader";
+import InventorySummary from "../components/inventory/InventorySummary";
+import SKUList from "../components/common/SKUList";
+import SKUDetail from "../components/common/SKUDetail";
 import useReplenishment, { ReplenishmentData } from "../hooks/useReplenishment";
 import useSkuInfo from "../hooks/useSkuInfo";
 import { validateThreshold } from "../validations/thresholdValidations";
 import { validateQtyPerPallet } from "../validations/qtyPerPalletValidations";
-import BarChartComponent from "../components/BarChartComponent";
+import BarChartComponent from "../components/charts/BarChartComponent";
 
 const CustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();

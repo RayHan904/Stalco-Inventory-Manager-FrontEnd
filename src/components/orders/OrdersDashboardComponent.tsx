@@ -7,8 +7,8 @@ import { addDays } from 'date-fns';
 import CheckboxOption from './CheckboxOption'; // Import the custom option component
 import MultiValue from './MultiValue'; // Import the custom MultiValue component
 import MyDateRangePicker from './DateRangePicker';
-import StackedBarChartComponent from './StackedBarChartComponent';
-import LineChartComponent from './LineChartComponent';
+import StackedBarChartComponent from '../charts/StackedBarChartComponent';
+import LineChartComponent from '../charts/LineChartComponent';
 // import MapChart from './MapChart';
 
 const OrdersDashboardComponent: React.FC = () => {

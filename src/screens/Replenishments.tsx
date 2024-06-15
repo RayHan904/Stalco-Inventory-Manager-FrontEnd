@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { CustomerData } from "../services/api";
 import { useCustomers } from "../contexts/CustomerContext";
 import useReplenishment from "../hooks/useReplenishment";
-import ReplenishmentInfo from "../components/ReplenishmentInfo";
+import ReplenishmentInfo from "../components/replenishments/ReplenishmentInfo";
 
 const Replenishments: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
