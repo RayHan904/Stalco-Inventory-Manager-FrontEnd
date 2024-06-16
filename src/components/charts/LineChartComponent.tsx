@@ -87,7 +87,7 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
   };
 
   const maxDataValue = Math.max(...datasets.flatMap(dataset => dataset.data));
-  const suggestedMax = maxDataValue > 8000 ? maxDataValue + 2000 : 8000;
+  const suggestedMax = maxDataValue > 3000 ? maxDataValue + 2000 : 3000;
 
   const options = {
     plugins: {
@@ -112,7 +112,7 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
     },
   };
 
-  return <Line style={{ height: '100%', margin: 'auto' }} data={chartData} options={options} />;
+  return <Line style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} />;
 };
 
 export default LineChartComponent;

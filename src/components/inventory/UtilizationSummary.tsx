@@ -15,9 +15,9 @@ const UtilizationSummary: React.FC<{ summary: SummaryProps['summary'] }> = ({ su
     const whlCount = summary?.WHL || 0;
     return (
         <>
-            <InfoCardComponent cardTitle="Overall Utilization"  perc="100%"/>
-            <InfoCardComponent cardTitle="WHL Utilization"   perc={`${((whlCount / total) * 100).toFixed(2)}%`} />
-            <InfoCardComponent cardTitle="Clayson Utilization"  perc={`${((claysonCount / total) * 100).toFixed(2)}%`} />
+            <InfoCardComponent cardTitle="Overall Utilization"  perc="100%"  width="100%"/>
+            <InfoCardComponent cardTitle="WHL Utilization"   perc={`${((whlCount / total) * 100).toFixed(2)}%`} width="100%" />
+            <InfoCardComponent cardTitle="Clayson Utilization"  perc={`${((claysonCount / total) * 100).toFixed(2)}%`} width="100%" />
         </>
     );
 };

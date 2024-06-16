@@ -115,3 +115,14 @@ main {
 }
 
 
+
+.custom-col {
+  padding: 15px; /* Adjust based on the desired spacing */
+}
+
+
+@media (max-width: 768px) {
+  .calendar-container .rdrDefinedRangesWrapper {
+    display: none;
+  }
+}

@@ -282,9 +282,9 @@ const CustomerDashboard: React.FC = () => {
         ) : (
           <>
             <Col md={6} sm={12}>
-              <InventorySummary summary={summary as { Total: number; Clayson: number; WHL: number }} />
+              <InventorySummary summary={summary as { Total: number; Clayson: number; WHL: number }} width="50%" />
             </Col>
-            <Col md={6} sm={12} style={{ maxHeight: "24vh" }}>
+            <Col md={5} sm={12} style={{ maxHeight: "24vh" }}>
               <BarChartComponent barChartData={barChartData} />
             </Col>
           </>

@@ -118,7 +118,7 @@ const MyDateRangePicker: FC = () => {
         />
       </InputGroup>
       {showCalendar && (
-        <div style={{ position: 'absolute', zIndex: 1000, border: '1px solid #ccc', borderRadius: '4px', padding: '10px', backgroundColor: 'white', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}>
+        <div className="calendar-container" style={calendarStyle}>
           <DateRangePicker
             editableDateInputs={true}
             onChange={handleDateChange}
@@ -136,5 +136,16 @@ const MyDateRangePicker: FC = () => {
     </div>
   );
 };
+
+const calendarStyle = {
+  position: 'absolute',
+  top: '100%',
+  left: "12px",
+  zIndex: 1000,
+  backgroundColor: '#fff',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  borderRadius: '4px',
+  overflow: 'hidden'
+} as const;
 
 export default MyDateRangePicker;

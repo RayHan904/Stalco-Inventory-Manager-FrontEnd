@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import Select from 'react-select';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { addDays } from 'date-fns';
-import CheckboxOption from './CheckboxOption'; // Import the custom option component
-import MultiValue from './MultiValue'; // Import the custom MultiValue component
-import MyDateRangePicker from './DateRangePicker';
+
 import StackedBarChartComponent from '../charts/StackedBarChartComponent';
 import LineChartComponent from '../charts/LineChartComponent';
+import BarChartComponent from '../charts/BarChartComponent';
+import DoughnutChartComponent from '../charts/DoughnutChartComponent';
+import InfoCardComponent from '../common/InfoCardComponent';
+import FilterComponent from './FilterComponent';
 // import MapChart from './MapChart';
 
 const OrdersDashboardComponent: React.FC = () => {
@@ -24,105 +25,70 @@ const OrdersDashboardComponent: React.FC = () => {
         },
     ]);
 
-    // const dynamicData = {
-    //     labels: [
-    //       '2024-06-1', '2024-06-2', '2024-06-3', '2024-06-4', '2024-06-5', '2024-06-6', '2024-06-7', '2024-06-8', '2024-06-9', '2024-06-10',
-    //       '2024-06-11', '2024-06-12', '2024-06-13', '2024-06-14', '2024-06-15', '2024-06-16', '2024-06-17', '2024-06-18', '2024-06-19', '2024-06-20',
-    //       '2024-06-21', '2024-06-22', '2024-06-23', '2024-06-24', '2024-06-25', '2024-06-26', '2024-06-27', '2024-06-28', '2024-06-29', '2024-06-30'
-    //     ],
-    //     datasets: [
-    //       {
-    //         label: "# of units (US)",
-    //         data: [
-    //           10, 20, 30, 40, 50, 90, 45, 60, 70, 80,
-    //           15, 25, 35, 45, 55, 95, 50, 65, 75, 85,
-    //           12, 22, 32, 42, 52, 92, 47, 67, 77, 87
-    //         ],
-    //         backgroundColor: '#FF6384',
-    //         hoverBackgroundColor: '#d35671',
-    //         borderWidth: 1,
-    //       },
-    //       {
-    //         label: "# of units (CA)",
-    //         data: [
-    //           20, 30, 40, 50, 200, 100, 25, 70, 80, 90,
-    //           30, 40, 50, 60, 210, 110, 30, 75, 85, 95,
-    //           25, 35, 45, 55, 205, 105, 27, 72, 82, 92
-    //         ],
-    //         backgroundColor: '#36A2EB',
-    //         hoverBackgroundColor: '#2d8ccd',
-    //         borderWidth: 1,
-    //       },
-    //       {
-    //         label: "# of units (INTL)",
-    //         data: [
-    //           30, 40, 50, 60, 100, 150, 22, 80, 90, 100,
-    //           40, 50, 60, 70, 110, 160, 32, 85, 95, 105,
-    //           35, 45, 55, 65, 105, 155, 27, 87, 97, 107
-    //         ],
-    //         backgroundColor: '#FFCE56',
-    //         hoverBackgroundColor: '#e6b453',
-    //         borderWidth: 1,
-    //       },
-    //       {
-    //         label: "# of units (Internal)",
-    //         data: [
-    //           40, 50, 60, 70, 0, 34, 98, 90, 100, 110,
-    //           50, 60, 70, 80, 10, 44, 108, 95, 105, 115,
-    //           45, 55, 65, 75, 5, 39, 103, 97, 107, 117
-    //         ],
-    //         backgroundColor: '#4BC0C0',
-    //         hoverBackgroundColor: '#3ba3a3',
-    //         borderWidth: 1,
-    //       }
-    //     ],
-    //   };
-      
+    const WHLvsClaysonData = {
+        labels: ['Clayson', 'WHL'],
+        label: '# of orders',
+        data: [103000, 49000],
+        minHeight: '20rem'
+    };
+
+    const RegionData = {
+        labels: ['US', 'Canada', "INTL", "Internal"],
+        label: '# of orders',
+        backgroundColor: ['#FFCE56', '#4BC0C0', '#FF6384', '#36A2EB'],
+        hoverBackgroundColor: ['#e6b453', '#3ba3a3', '#d35671', '#2d8ccd'],
+        data: [103000, 49000, 500, 53],
+        minHeight: '20rem'
+    };
+
     const getRandomValue = () => Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
 
-      const dynamicData = {
-        labels: Array.from({ length: 100 }, (_, index) => `Q${index + 1}`),
+    const dynamicData = {
+        labels: Array.from({ length: 30 }, (_, index) => `Q${index + 1}`),
         datasets: [
-          {
-            label: "# of units (US)",
-            data: Array.from({ length: 100 }, () => getRandomValue()),
-            backgroundColor: '#FF6384',
-            hoverBackgroundColor: '#d35671',
-            borderWidth: 3,
-          },
-          {
-            label: "# of units (CA)",
-            data: Array.from({ length: 100 }, () => getRandomValue()),
-            backgroundColor: '#36A2EB',
-            hoverBackgroundColor: '#2d8ccd',
-            borderWidth: 3,
-          },
-          {
-            label: "# of units (INTL)",
-            data: Array.from({ length: 100 }, (_, index) => (index + 1) * 7),
-            backgroundColor: '#FFCE56',
-            hoverBackgroundColor: '#e6b453',
-            borderWidth: 3,
-          },
-          {
-            label: "# of units (Internal)",
-            data: Array.from({ length: 100 }, () => getRandomValue()),
-            backgroundColor: '#4BC0C0',
-            hoverBackgroundColor: '#3ba3a3',
-            borderWidth: 3,
-          }
+
+            {
+                label: "# of units (Internal)",
+                data: Array.from({ length: 30 }, () => getRandomValue()),
+                backgroundColor: '#4BC0C0',
+                hoverBackgroundColor: '#3ba3a3',
+                borderWidth: 3,
+            },
+            {
+                label: "# of units (INTL)",
+                data: Array.from({ length: 30 }, (_, index) => (index + 1) * 7),
+                backgroundColor: '#FFCE56',
+                hoverBackgroundColor: '#e6b453',
+                borderWidth: 3,
+            },
+            {
+                label: "# of units (CA)",
+                data: Array.from({ length: 30 }, () => getRandomValue()),
+                backgroundColor: '#36A2EB',
+                hoverBackgroundColor: '#2d8ccd',
+                borderWidth: 3,
+            },
+
+            {
+                label: "# of units (US)",
+                data: Array.from({ length: 30 }, () => getRandomValue()),
+                backgroundColor: '#FF6384',
+                hoverBackgroundColor: '#d35671',
+                borderWidth: 3,
+            }
+
         ],
-      };
-      const mapData = [
+    };
+    const mapData = [
         { id: "California", value: 100 },
         { id: "New York", value: 75 },
         { id: "Texas", value: 50 },
         // Add more states/provinces
-      ];
-      
-      // Example output of dynamicData for visualization:
-      console.log(dynamicData);
-      
+    ];
+
+    // Example output of dynamicData for visualization:
+    console.log(dynamicData);
+
     const customerNamesOptions = [
         { value: 'Biovation Labs, LLC', label: 'Biovation Labs, LLC' },
         { value: 'CK', label: 'Cuddle And Kind' },
@@ -133,6 +99,7 @@ const OrdersDashboardComponent: React.FC = () => {
     ];
 
     const regionsOptions = ['US', 'CA', 'INTL', 'INTERNAL'];
+    const facilityOptions = ['Clayson', 'WHL'];
 
     const countryOptions = [
         { value: 'US', label: 'United States' },
@@ -147,6 +114,24 @@ const OrdersDashboardComponent: React.FC = () => {
         { value: 'HYD', label: 'Hyderabad' },
         // Add more states here
     ];
+
+
+    const Top10BarchartData = {
+        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        label: "Top 10 - # of Orders Confirmed by Customer",
+        data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
+        backgroundColor: [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40'
+        ],
+        hoverBackgroundColor: [
+            '#d35671', '#2d8ccd', '#d4b446', '#3b9b9b', '#7d5fcc',
+            '#d48136'
+        ],
+        borderWidth: 1,
+        indexAxis: 'y',
+        height: '20rem'
+    }
 
     const handleSelectCustomerNames = (selectedOptions: any) => {
         setSelectedCustomerNames(selectedOptions);
@@ -192,8 +177,42 @@ const OrdersDashboardComponent: React.FC = () => {
         }),
     };
 
+    const dataLabelTop10 = true;
+
+    const isArranged = true;
     return (
         <Container>
+
+            <Row>
+                <Col md={3}>
+                    <FilterComponent
+                        customerNamesOptions={customerNamesOptions}
+                        selectedCustomerNames={selectedCustomerNames}
+                        handleSelectCustomerNames={handleSelectCustomerNames}
+                        regionsOptions={regionsOptions}
+                        facilityOptions={facilityOptions}
+                        selectedRegions={selectedRegions}
+                        handleSelectRegions={handleSelectRegions}
+                        countryOptions={countryOptions}
+                        selectedCountries={selectedCountries}
+                        handleSelectCountries={handleSelectCountries}
+                        stateOptions={stateOptions}
+                        selectedStates={selectedStates}
+                        handleSelectStates={handleSelectStates}
+                        customStyles={customStyles}
+                    />
+                </Col>
+
+
+                <Col xs={12} md={9}>
+                    {dynamicData.labels.length >= 45 ? (
+                        <LineChartComponent lineChart={dynamicData} />
+                    ) : (
+                        <StackedBarChartComponent stackedBarChart={dynamicData} />
+                    )}
+                </Col>
+            </Row>
+            {/* 
             <Row>
                 <Col md={3}>
                     <Row className="sub-row" md={12}>
@@ -266,18 +285,47 @@ const OrdersDashboardComponent: React.FC = () => {
                         <Button style={{width:'50%', margin:'0 auto'}}>Apply Filter</Button>
                     </Row>
                 </Col>
-                <Col md={9}>
+                <Col xs={12} md={9}>
              
                     {dynamicData.labels.length >= 45 ?  <LineChartComponent lineChart={dynamicData} /> : <StackedBarChartComponent stackedBarChart={dynamicData} />}
                
                 </Col>
-            </Row>
-            <hr/>
-            <Row>
-                <Col>
-                {/* <MapChart  /> */}
+            </Row> */}
+
+
+            <Row style={{ display: 'flex', justifyContent: 'space-between', margin:"1rem 0" }}>
+                <Col xs={6} md={2} >
+                    <InfoCardComponent cardTitle='Total Orders' text='100,000' width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='US' text='65,000' width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='Canada' text='30,000' width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='INTL ' text='4,000' width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='Internal ' text='1,000' width='100%' />
                 </Col>
             </Row>
+            <hr />
+            <Row className="custom-row">
+                <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
+                    <BarChartComponent barChartData={Top10BarchartData} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                </Col>
+                <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
+                    <DoughnutChartComponent doughnutChartData={{ data: [1000, 150] }} />
+                </Col>
+                <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
+                    <BarChartComponent barChartData={WHLvsClaysonData} />
+                </Col>
+                <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
+                    <BarChartComponent barChartData={RegionData} />
+                </Col>
+            </Row>
+
         </Container>
     );
 };

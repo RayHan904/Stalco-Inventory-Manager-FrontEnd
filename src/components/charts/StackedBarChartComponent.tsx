@@ -95,7 +95,7 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
     },
   };
 
-  return <Bar style={{ height: '100%', margin: 'auto' }} data={chartData} options={options} />;
+  return <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} />;
 };
 
 export default StackedBarChartComponent;

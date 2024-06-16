@@ -99,7 +99,7 @@ const Home: React.FC = () => {
         ) : (
           <>
             <Col md={2} xs={6}>
-              <InventorySummary summary={{ Total: 100000, Clayson: 40000, WHL: 60000 }} />
+              <InventorySummary summary={{ Total: 100000, Clayson: 40000, WHL: 60000 }} width='100%'/>
             </Col>
             <Col md={2} xs={6}>
               <UtilizationSummary summary={{ Total: 100000, Clayson: 40000, WHL: 60000 }} />
