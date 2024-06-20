@@ -1,11 +1,20 @@
 // api.js
 import axios from "axios";
-import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, REPLENISHMENT_URL, SKUINFO_URL } from "../constants";
+import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, ORDERS_URL, REPLENISHMENT_URL, SKUINFO_URL } from "../constants";
+import { Order } from "../components/orders/OrdersDashboardComponent";
 
 export interface CustomerData {
     customerId: number;
     companyName: string;
     deactivated: boolean;
+  }
+export interface OrdersData {
+dbData:{
+  orders: Order[],
+  regionShipped: any,
+  customers:any
+
+}
   }
 
  export interface SKUReplenishmentData {
@@ -24,7 +33,7 @@ export interface CustomerData {
     qtyPerPallet: string;
   }
   
-
+//CUSTOMERS
 
 export async function fetchCustomers() {
     try {
@@ -36,6 +45,8 @@ export async function fetchCustomers() {
       throw error;
     }
   }
+
+ //INVENTORY
 export async function fetchInventory(customerId: string | number | undefined) {
     try {
       console.log("FETCHING INVENTORY DATA")
@@ -47,6 +58,10 @@ export async function fetchInventory(customerId: string | number | undefined) {
       throw error;
     }
   }
+
+
+  //REPLENISHMENT
+
 export async function fetchThreshold() {
     try {
       console.log("FETCHING REPLENISHMENT DATA")
@@ -59,17 +74,7 @@ export async function fetchThreshold() {
     }
   }
 
-  export async function fetchAllSkuInfo() {
-    try {
-      console.log("FETCHING SKU INFO DATA")
 
-      const response = await axios.get(BASE_URL + SKUINFO_URL );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching QTY PER PALLET data:", error);
-      throw error;
-    }
-  }
 
   export const updateSKUReplenishment = async (sku: string, threshold: string): Promise<void> => {
     try {
@@ -130,6 +135,20 @@ export async function fetchThreshold() {
   }
 
 
+  //SKU INFO
+
+  export async function fetchAllSkuInfo() {
+    try {
+      console.log("FETCHING SKU INFO DATA")
+
+      const response = await axios.get(BASE_URL + SKUINFO_URL );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching QTY PER PALLET data:", error);
+      throw error;
+    }
+  }
+
   export const updateSkuInfo = async (sku: string, qtyPerPallet: string): Promise<void> => {
     try {
       const response = await axios.put(BASE_URL + SKUINFO_URL + `/${sku}`, { qtyPerPallet });
@@ -169,6 +188,30 @@ export async function fetchThreshold() {
       return response.data;
     } catch (error) {
       console.error("Error fetching sku info data:", error);
+      throw error;
+    }
+  }
+
+  //ORDERS DATA
+
+  export const fetchOrdersData = async () => {
+    try {
+      console.log("FETCHING ORDERS DATA")
+      const response = await axios.get(BASE_URL + ORDERS_URL + "/last-six-months");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Orders data:",error);
+      throw error;
+    }
+  }
+
+  export const fetchOrdersDataByRange = async () => {
+    try {
+      console.log("FETCHING ORDERS DATA BY RANGE")
+      const response = await axios.get(BASE_URL + ORDERS_URL);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Orders data by range:",error);
       throw error;
     }
   }

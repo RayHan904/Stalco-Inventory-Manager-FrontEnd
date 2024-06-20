@@ -104,7 +104,6 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
       y: {
         display: true,
         min: 0, // Set minimum value for Y-axis
-        max: suggestedMax, // Set dynamic maximum value for Y-axis
       },
       x: {
         display: true,

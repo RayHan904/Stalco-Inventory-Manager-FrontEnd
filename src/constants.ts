@@ -6,3 +6,4 @@ export const OFF_SITE_INVENTORY_URL: String = "/api/inventory";
 export const CUSTOMERS_URL: string = "/api/customer";
 export const REPLENISHMENT_URL: string = "/api/replenishment";
 export const SKUINFO_URL: string = "/api/skuInfo";
+export const ORDERS_URL: string = "/api/orders";

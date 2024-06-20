@@ -3,13 +3,13 @@ import { Card } from 'react-bootstrap';
 
 interface InfoCardProps {
     cardTitle: string;
-    text?: string;
+    text?: string | number;
     perc?: string;
     width?: string;
   }
   
 
-const InfoCardComponent: React.FC<{cardTitle: string, text?: string, perc?: string, width?: string}> = ({cardTitle, text, perc, width = "50%"}: InfoCardProps) => {
+const InfoCardComponent: React.FC<{cardTitle: string, text?: string | number, perc?: string, width?: string}> = ({cardTitle, text, perc, width = "50%"}: InfoCardProps) => {
 
   return (
     <Card className="text-center" style={{ width: width, margin: '0 auto', marginBottom: '10px', padding: '3px' }}>

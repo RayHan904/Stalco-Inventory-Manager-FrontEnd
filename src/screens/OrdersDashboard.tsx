@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent,  useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Col, Container, Form, Row, Button } from "react-bootstrap";
 import { useSelectedCustomer } from "../contexts/SelectedCustomerContext";
@@ -8,35 +8,20 @@ import Loader from "../components/layout/Loader";
 import CustomerSelect from "../components/common/CustomerSelect";
 import { CustomerData } from "../services/api";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
-import useLoading from "../hooks/useLoading";
 import OrdersDashboardComponent from "../components/orders/OrdersDashboardComponent";
+import { useOrdersDashboardData } from "../contexts/OrdersDashboardDataContext";
 
 const OrdersDashboard: React.FC = () => {
   const { selectedCustomer, setSelectedCustomer } = useSelectedCustomer();
   const { customersData, isCustomersLoading } = useCustomers();
-  const { isLoading, startLoading, stopLoading } = useLoading();
+  const {  isFilterdOrdersDataLoading } = useOrdersDashboardData();
+
 
   const [overviewShow, setOverviewShow] = useState(true);
 
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      startLoading();
-      try {
-        // Fetch Orders data logic here
-        setTimeout(() => {
-          stopLoading();
-        }, 1000); 
-      } catch (error) {
-        console.error("Error fetching utilization data:", error);
-        toast.error("Error fetching capacity utilization data.");
-        stopLoading();
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleSelect = (customer: CustomerData) => {
     setSelectedCustomer(customer);
@@ -73,7 +58,7 @@ const OrdersDashboard: React.FC = () => {
             </div>
           )}
         </div>
-        {isLoading ? (
+        {isFilterdOrdersDataLoading ? (
           <div className="mb-3">
           <Loader />
           </div>

@@ -12,6 +12,7 @@ import { LoadingProvider } from "./contexts/LoadingContext";
 import Replenishments from "./screens/Replenishments";
 import { CustomersProvider } from "./contexts/CustomerContext";
 import OrdersDashboard from "./screens/OrdersDashboard";
+import { OrdersDashboardDataProvider } from "./contexts/OrdersDashboardDataContext";
 
 const rootElement = document.getElementById("root");
 
@@ -21,6 +22,7 @@ if (!rootElement) {
 
 const router = (
   <SelectedCustomerProvider>
+    <OrdersDashboardDataProvider>
     <CustomersProvider>
     <LoadingProvider>
   <BrowserRouter>
@@ -37,6 +39,7 @@ const router = (
   </BrowserRouter>
   </LoadingProvider>
   </CustomersProvider>
+  </OrdersDashboardDataProvider>
   </SelectedCustomerProvider>
 
 );
