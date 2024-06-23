@@ -12,7 +12,8 @@ export interface OrdersData {
 dbData:{
   orders: Order[],
   regionShipped: any,
-  customers:any
+  customers:any,
+  filterOptions: any,
 
 }
   }

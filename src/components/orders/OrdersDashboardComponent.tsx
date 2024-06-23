@@ -9,9 +9,9 @@ import BarChartComponent from '../charts/BarChartComponent';
 import DoughnutChartComponent from '../charts/DoughnutChartComponent';
 import InfoCardComponent from '../common/InfoCardComponent';
 import FilterComponent from './FilterComponent';
-import { transformOrdersDataForOrderVolumeByRegionPerDate } from '../../utils/dataTransformatinos';
 import { useOrdersDashboardData } from '../../contexts/OrdersDashboardDataContext';
 import Loader from '../layout/Loader';
+import useOrdersData from '../../hooks/useOrdersData';
 
 export interface Order {
     client_id: string;
@@ -48,67 +48,46 @@ export interface DynamicData {
     datasets: Dataset[];
 }
 
+export interface Top10BarChartData {
+    labels: string[];
+    label: string;
+    data: number[];
+    backgroundColor: string[];
+    hoverBackgroundColor: string[];
+    borderWidth: number;
+    indexAxis: string;
+    height: string;
+    minHeight?: string;
+}
+
 const OrdersDashboardComponent: React.FC = () => {
 
     const {
-        selectedCustomerNames,
-        setSelectedCustomerNames,
-        selectedRegions,
-        setSelectedRegions,
-        selectedCountries,
-        setSelectedCountries,
-        selectedStates,
-        setSelectedStates,
-        dateRange,
-        setDateRange,
-        filteredOrdersData,
+        dynamicData,
+        top10OrdersConfimredByCustomer,
         isFilterdOrdersDataLoading,
-        handleSelectCustomerNames,
-        handleSelectRegions,
-        handleSelectCountries,
-        handleSelectStates,
-        handleDateRangeChange,
+        ordersData, 
+        isOrdersDataLoading
+
       } = useOrdersDashboardData();
 
+    const {  } = useOrdersData();
 
 
- const [dynamicData, setDynamicData] = useState<DynamicData | null>()
 
 
   useEffect(() => {
 
-    setDynamicData(!isFilterdOrdersDataLoading && filteredOrdersData ? transformOrdersDataForOrderVolumeByRegionPerDate(filteredOrdersData.dbData.orders) : null);
-
-}, [filteredOrdersData]);
+}, [ordersData]);
     
-    // Example output of dynamicData for visualization:
 
-    const customerNamesOptions = [
-        { value: 'Biovation Labs, LLC', label: 'Biovation Labs, LLC' },
-        { value: 'CK', label: 'Cuddle And Kind' },
-        { value: 'Orbio', label: 'Orbio World' },
-        { value: 'LUS', label: 'LUS' },
-        { value: 'XYNG', label: 'Xyngular' },
-        // Add more customer names here
-    ];
-    const regionsOptions = ['US', 'CA', 'INTL', 'INTERNAL'];
-    const facilityOptions = ['Clayson', 'WHL'];
-    const countryOptions = [
-        { value: 'US', label: 'United States' },
-        { value: 'CA', label: 'Canada' },
-        { value: 'IND', label: 'India' },
-        // Add more countries here
-    ];
-    const stateOptions = [
-        { value: 'CA', label: 'California' },
-        { value: 'ON', label: 'Ontario' },
-        { value: 'HYD', label: 'Hyderabad' },
-        // Add more states here
-    ];
+
+
+
     const Top10BarchartData = {
-        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        labels: top10OrdersConfimredByCustomer? top10OrdersConfimredByCustomer.labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
         label: "Top 10 - # of Orders Confirmed by Customer",
-        data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
+        data: top10OrdersConfimredByCustomer? top10OrdersConfimredByCustomer.data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
         backgroundColor: [
             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
             '#FF9F40'
@@ -121,6 +100,8 @@ const OrdersDashboardComponent: React.FC = () => {
         indexAxis: 'y',
         height: '20rem'
     }
+console.log("TYPE of static!", Top10BarchartData)
+
     const WHLvsClaysonData = {
         labels: ['Clayson', 'WHL'],
         label: '# of orders',
@@ -164,29 +145,21 @@ const OrdersDashboardComponent: React.FC = () => {
         <Container>
 
             <Row>
-                <Col md={3}>
-                    <FilterComponent
-                        customerNamesOptions={customerNamesOptions}
-                        selectedCustomerNames={selectedCustomerNames}
-                        handleSelectCustomerNames={handleSelectCustomerNames}
-                        regionsOptions={regionsOptions}
-                        facilityOptions={facilityOptions}
-                        selectedRegions={selectedRegions}
-                        handleSelectRegions={handleSelectRegions}
-                        countryOptions={countryOptions}
-                        selectedCountries={selectedCountries}
-                        handleSelectCountries={handleSelectCountries}
-                        stateOptions={stateOptions}
-                        selectedStates={selectedStates}
-                        handleSelectStates={handleSelectStates}
-                        customStyles={customStyles}
-                    />
-                </Col>
+<Col md={3}>
+<FilterComponent
+        customerNamesOptions={ordersData?.dbData.filterOptions?.customerNameOptions }
+        countryOptions={ordersData?.dbData.filterOptions?.countryOptions }
+        stateOptions={ordersData?.dbData.filterOptions?.stateOptions }
+        customStyles={customStyles}
+    />
+</Col>
+
+
 
 
 <Col xs={12} md={9}>
 
-    {isFilterdOrdersDataLoading ? <Loader/> : dynamicData && dynamicData.labels.length >= 31 ? (
+    {isOrdersDataLoading || isFilterdOrdersDataLoading? <div><Loader dims={75}/> </div> : dynamicData && dynamicData.labels.length >= 31 ? (
         <LineChartComponent {...(dynamicData ? { lineChart: dynamicData } : {})} />
     ) : (
         <StackedBarChartComponent {...(dynamicData ? { stackedBarChart: dynamicData } : {})} />
@@ -214,7 +187,11 @@ const OrdersDashboardComponent: React.FC = () => {
             <hr />
             <Row className="custom-row">
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
-                    <BarChartComponent barChartData={Top10BarchartData} dataLabel={dataLabelTop10} isArranged={isArranged} />
+
+                    {
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10BarchartData ? Top10BarchartData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                    }
+                    
                 </Col>
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
                     <DoughnutChartComponent doughnutChartData={{ data: [1000, 150] }} />

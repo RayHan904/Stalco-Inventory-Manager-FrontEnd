@@ -3,8 +3,10 @@ import { addDays } from 'date-fns';
 import useOrdersData from '../hooks/useOrdersData';
 import useLoading from '../hooks/useLoading'
 import { OrdersData } from '../services/api';
+import { DynamicData, Order, Top10BarChartData } from '../components/orders/OrdersDashboardComponent';
+import { filterOrders, transformOrdersDataForOrderVolumeByRegionPerDate, transformOrdersDataForTop10OrdersConfirmed } from '../utils/dataTransformatinos';
 
-interface DateRange {
+export interface DateRange {
   startDate: Date;
   endDate: Date;
   key: string;
@@ -19,8 +21,8 @@ interface DataContextType {
   setSelectedCountries: React.Dispatch<React.SetStateAction<any[]>>;
   selectedStates: any[];
   setSelectedStates: React.Dispatch<React.SetStateAction<any[]>>;
-  dateRange: DateRange[];
-  setDateRange: React.Dispatch<React.SetStateAction<DateRange[]>>;
+  dateRange: DateRange;
+  setDateRange: React.Dispatch<React.SetStateAction<DateRange>>;
   filteredOrdersData: any; 
   fetchOrdersDatawithRange: () => void; 
   isFilterdOrdersDataLoading: boolean;
@@ -28,7 +30,12 @@ interface DataContextType {
   handleSelectRegions: (region: string) => void;
   handleSelectCountries: (selectedOptions: any) => void;
   handleSelectStates: (selectedOptions: any) => void;
-  handleDateRangeChange: (ranges: { selection: DateRange }) => void;
+  handleDateRangeChange: (ranges: { [key: string]: DateRange; }) => void;
+  handleApplyFilter: () => void;
+  dynamicData:DynamicData | null | undefined;
+  ordersData: OrdersData | null;
+  top10OrdersConfimredByCustomer: Top10BarChartData | null | undefined;
+  isOrdersDataLoading:  boolean;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -42,46 +49,45 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     const { isLoading: isFilterdOrdersDataLoading, startLoading: startFilterdOrdersDataLoading, stopLoading: stopFilterdOrdersDataLoading } = useLoading();
 
 
-  const [filteredOrdersData, setFilterdOrdersData] = useState<OrdersData>();
+  const [filteredOrdersData, setFilterdOrdersData] = useState<Order[]>([]);
   const [selectedCustomerNames, setSelectedCustomerNames] = useState<any[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<any[]>([]);
   const [selectedStates, setSelectedStates] = useState<any[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange[]>([
+  const [dateRange, setDateRange] = useState<DateRange>(
     {
       startDate: new Date(),
       endDate: addDays(new Date(), 7),
       key: 'selection',
     },
-  ]);
-
+  );
+  const [dynamicData, setDynamicData] = useState<DynamicData | null>()
+  const [top10OrdersConfimredByCustomer, setTop10OrdersConfimredByCustomer] = useState<Top10BarChartData | null>()
 
 
 
   useEffect(() => {
-    startFilterdOrdersDataLoading();
-
-    const handleDataLoading = () => {
-        if (!isOrdersDataLoading) {
-            if (ordersData) {
-                setFilterdOrdersData(ordersData);
-                stopFilterdOrdersDataLoading();
-            } else {
-                // If ordersData is still not available, wait and check again
-                setTimeout(() => {
-                    if (ordersData) {
-                        setFilterdOrdersData(ordersData);
-                    }
-                    stopFilterdOrdersDataLoading();
-                }, 5000);
-            }
-        }
-    };
-
-    handleDataLoading();
+    setDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByRegionPerDate(ordersData.dbData.orders) : null);
+    setTop10OrdersConfimredByCustomer(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersConfirmed(ordersData.dbData.orders) : null);
 }, [ordersData]);
 
+const handleApplyFilter = async () => {
+    startFilterdOrdersDataLoading();
 
+    const filteredData : Order[] =  filterOrders({
+        dateRange,
+        selectedRegions,
+        selectedCustomerNames
+    }, ordersData?.dbData.orders)
+
+    setFilterdOrdersData(filteredData);
+
+    setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerDate(filteredData))
+    setTop10OrdersConfimredByCustomer( filteredData && transformOrdersDataForTop10OrdersConfirmed(filteredData))
+    console.log("HERE is ", top10OrdersConfimredByCustomer)
+
+    stopFilterdOrdersDataLoading();
+}
 
   const handleSelectCustomerNames = (selectedOptions: any) => {
     setSelectedCustomerNames(selectedOptions);
@@ -101,8 +107,16 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     setSelectedStates(selectedOptions);
   };
 
-  const handleDateRangeChange = (ranges: { selection: DateRange }) => {
-    setDateRange([ranges.selection]);
+  const handleDateRangeChange = (ranges: { [key: string]: DateRange }) => {
+    const newSelection = ranges.selection;
+    if (newSelection && newSelection.startDate && newSelection.endDate) {
+      console.log('New selection:', newSelection);
+      setDateRange({
+        startDate: newSelection.startDate,
+        endDate: newSelection.endDate,
+        key: 'selection'
+      });
+    }
   };
 
   const value: DataContextType = {
@@ -124,6 +138,11 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     fetchOrdersDatawithRange,
     handleSelectStates,
     handleDateRangeChange,
+    handleApplyFilter,
+    dynamicData, 
+    top10OrdersConfimredByCustomer,
+    ordersData, 
+    isOrdersDataLoading
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

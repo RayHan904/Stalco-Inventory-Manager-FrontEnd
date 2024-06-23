@@ -2,6 +2,7 @@ import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement, ChartOptions } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Top10BarChartData } from '../orders/OrdersDashboardComponent';
 
 ChartJS.register(
     CategoryScale,
@@ -25,7 +26,7 @@ interface BarChartData {
   borderWidth: number;
   indexAxis: string;
   height: string;
-  minHeight: string;
+  minHeight?: string;
 }
 
 const defaultBarChartData: BarChartData = {
@@ -40,9 +41,10 @@ const defaultBarChartData: BarChartData = {
   minHeight: '0'
 };
 
+const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10BarChartData>, dataLabel?: boolean, isArranged?: boolean, minHeight?: string }> = ({ barChartData = {}, dataLabel = false, isArranged = false, minHeight }) => {
+  // Ensure barChartData is never null or undefined
+  const safeBarChartData = barChartData ?? {};
 
-
-const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData>, dataLabel?: boolean, isArranged?: boolean, minHeight?: string }> = ({ barChartData = {}, dataLabel = false, isArranged = false,  }) => {
   const {
     labels = defaultBarChartData.labels,
     label = defaultBarChartData.label,
@@ -52,8 +54,8 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData>, dataLa
     borderWidth = defaultBarChartData.borderWidth,
     indexAxis = defaultBarChartData.indexAxis,
     height = defaultBarChartData.height,
-    minHeight = defaultBarChartData.minHeight,
-  } = barChartData;
+    minHeight: chartMinHeight = defaultBarChartData.minHeight,
+  } = safeBarChartData;
 
   const chartData = {
     labels,
@@ -79,7 +81,7 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData>, dataLa
   }
 
   const options: ChartOptions<'bar'> = {
-    responsive:true,
+    responsive: true,
     indexAxis: indexAxis === 'y' ? 'y' : 'x', // This option makes the bar chart horizontal
     maintainAspectRatio: false,
     plugins: dataLabel ? {
@@ -96,7 +98,7 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData>, dataLa
   };
 
   return (
-    <div style={{ height: height, minHeight: minHeight }}>
+    <div style={{ height: height, minHeight: minHeight ?? chartMinHeight }}>
       <Bar data={chartData} options={options} plugins={dataLabel ? [ChartDataLabels] : []} />
     </div>
   );

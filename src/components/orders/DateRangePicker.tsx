@@ -6,27 +6,17 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
 import { DateRangePicker, DateRange, StaticRange } from 'react-date-range';
 import { addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 
-const MyDateRangePicker: FC = () => {
-  const [selectionRange, setSelectionRange] = useState<DateRange>({
-    startDate: new Date(),
-    endDate: new Date(),
-    key: 'selection'
-  });
+
+interface DateRangePickerProps {
+  dateRange: DateRange;
+  handleDateRangeChange:(ranges: { [key: string]: DateRange; }) => void;
+}
+
+const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDateRangeChange}) => {
 
   const [showCalendar, setShowCalendar] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const handleDateChange = (ranges: { [key: string]: DateRange }) => {
-    const newSelection = ranges.selection;
-    if (newSelection && newSelection.startDate && newSelection.endDate) {
-      console.log('New selection:', newSelection);
-      setSelectionRange({
-        startDate: newSelection.startDate,
-        endDate: newSelection.endDate,
-        key: 'selection'
-      });
-    }
-  };
 
   const handleInputClick = () => {
     setShowCalendar(!showCalendar);
@@ -49,8 +39,8 @@ const MyDateRangePicker: FC = () => {
     };
   }, []);
 
-  const formattedStartDate = selectionRange.startDate ? selectionRange.startDate.toISOString().split('T')[0] : '';
-  const formattedEndDate = selectionRange.endDate ? selectionRange.endDate.toISOString().split('T')[0] : '';
+  const formattedStartDate = dateRange.startDate ? dateRange.startDate.toISOString().split('T')[0] : '';
+  const formattedEndDate = dateRange.endDate ? dateRange.endDate.toISOString().split('T')[0] : '';
 
   const createStaticRange = (label: string, rangeFunc: () => DateRange): StaticRange => ({
     label,
@@ -121,9 +111,9 @@ const MyDateRangePicker: FC = () => {
         <div className="calendar-container" style={calendarStyle}>
           <DateRangePicker
             editableDateInputs={true}
-            onChange={handleDateChange}
+            onChange={handleDateRangeChange}
             moveRangeOnFirstSelection={false}
-            ranges={[selectionRange]}
+            ranges={[dateRange]}
             staticRanges={customStaticRanges}
             inputRanges={[]}
           />
