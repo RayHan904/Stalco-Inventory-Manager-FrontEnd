@@ -118,8 +118,8 @@ const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDa
             inputRanges={[]}
           />
           <hr />
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-            <Button variant="primary" onClick={handleSelectClick}>Select</Button>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
+            <Button  className="mb-3" variant="primary"  onClick={handleSelectClick}>Select</Button>
           </div>
         </div>
       )}

@@ -95,6 +95,11 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
         mode: 'index' as const,
         intersect: false,
       },
+      datalabels: {
+        display: false,
+        color: 'white',
+        formatter: (value: number) => value, // Display the value
+      },
       legend: {
         position: 'top' as const,
       },
@@ -104,6 +109,7 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
       y: {
         display: true,
         min: 0, // Set minimum value for Y-axis
+        max: suggestedMax, // Set dynamic maximum value for Y-axis
       },
       x: {
         display: true,

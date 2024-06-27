@@ -44,7 +44,16 @@ const PieChartComponent: React.FC<{ pieChartData?: Partial<PieChartData> }> = ({
     ],
   };
 
-  return <Pie style={{height: '30rem'}} data={chartData} />;
+  const options = {
+    plugins: {
+      datalabels: {
+        display: false,
+
+      },
+    },
+  };
+
+  return <Pie style={{height: '30rem'}} data={chartData}  options={options}/>;
 };
 
 export default PieChartComponent;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -29,6 +29,20 @@ export interface Order {
     other_carriers: number;
     avg_qty_per_order: string;
 }
+export interface regionShipped {
+    client_id: string;
+    date: string;
+    total_orders: number;
+    country: string;
+    state_province: string;
+}
+export interface regionShipped {
+    client_id: string;
+    date: string;
+    total_orders: number;
+    country: string;
+    state_province: string;
+}
 
 export interface Dataset {
     label: string;
@@ -50,7 +64,29 @@ export interface DynamicData {
 
 export interface Top10BarChartData {
     labels: string[];
-    label: string;
+    title: string;
+    data: number[];
+    backgroundColor: string[];
+    hoverBackgroundColor: string[];
+    borderWidth: number;
+    indexAxis: string;
+    height: string;
+    minHeight?: string;
+}
+export interface top10CountriesData {
+    labels: string[];
+    title: string;
+    data: number[];
+    backgroundColor: string[];
+    hoverBackgroundColor: string[];
+    borderWidth: number;
+    indexAxis: string;
+    height: string;
+    minHeight?: string;
+}
+export interface top10StatesData {
+    labels: string[];
+    title: string;
     data: number[];
     backgroundColor: string[];
     hoverBackgroundColor: string[];
@@ -60,11 +96,27 @@ export interface Top10BarChartData {
     minHeight?: string;
 }
 
+export interface WHLvsClaysonData {
+    labels: string[];
+    title: string;
+    data: number[];
+    minHeight: string;
+}
+export interface WhiteLabelData {
+    labels: string[];
+    title: string;
+    data: number[];
+}
+
 const OrdersDashboardComponent: React.FC = () => {
 
     const {
         dynamicData,
         top10OrdersConfimredByCustomer,
+        countryShipped,
+        stateShipped,
+        WHLvsClaysonData,
+        WhiteLabelData,
         isFilterdOrdersDataLoading,
         ordersData, 
         isOrdersDataLoading
@@ -81,12 +133,9 @@ const OrdersDashboardComponent: React.FC = () => {
 }, [ordersData]);
     
 
-
-
-
     const Top10BarchartData = {
         labels: top10OrdersConfimredByCustomer? top10OrdersConfimredByCustomer.labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
-        label: "Top 10 - # of Orders Confirmed by Customer",
+        title: top10OrdersConfimredByCustomer? top10OrdersConfimredByCustomer.title : "# of orders",
         data: top10OrdersConfimredByCustomer? top10OrdersConfimredByCustomer.data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
         backgroundColor: [
             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
@@ -100,22 +149,35 @@ const OrdersDashboardComponent: React.FC = () => {
         indexAxis: 'y',
         height: '20rem'
     }
+    const Top10CountriesData = {
+        labels: countryShipped? countryShipped.labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        title: countryShipped? countryShipped.title : "# of orders",
+        data: countryShipped? countryShipped.data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
+        backgroundColor: [
+             '#FF9F40'
+        ],
+        hoverBackgroundColor: [ '#d48136',
+           
+        ],
+        borderWidth: 1,
+        indexAxis: 'y',
+        height: '20rem'
+    }
+    const Top10StatesData = {
+        labels: stateShipped? stateShipped.labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        title: stateShipped? stateShipped.title : "# of orders",
+        data: stateShipped? stateShipped.data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
+        backgroundColor: [
+            '#FF9F40'
+       ],
+       hoverBackgroundColor: [ '#d48136',
+          
+       ],
+        borderWidth: 1,
+        indexAxis: 'y',
+        height: '20rem'
+    }
 console.log("TYPE of static!", Top10BarchartData)
-
-    const WHLvsClaysonData = {
-        labels: ['Clayson', 'WHL'],
-        label: '# of orders',
-        data: [103000, 49000],
-        minHeight: '20rem'
-    };
-    const RegionData = {
-        labels: ['US', 'Canada', "INTL", "Internal"],
-        label: '# of orders',
-        backgroundColor: ['#FFCE56', '#4BC0C0', '#FF6384', '#36A2EB'],
-        hoverBackgroundColor: ['#e6b453', '#3ba3a3', '#d35671', '#2d8ccd'],
-        data: [103000, 49000, 500, 53],
-        minHeight: '20rem'
-    };
 
 
     const customStyles = {
@@ -194,13 +256,28 @@ console.log("TYPE of static!", Top10BarchartData)
                     
                 </Col>
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
-                    <DoughnutChartComponent doughnutChartData={{ data: [1000, 150] }} />
+                    {
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <DoughnutChartComponent doughnutChartData={WhiteLabelData ? WhiteLabelData : {}} />
+                    }
                 </Col>
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
-                    <BarChartComponent barChartData={WHLvsClaysonData} />
+                    {
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={WHLvsClaysonData ? WHLvsClaysonData : {}}  />
+                    }
                 </Col>
+                {/* <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
+
+                    {
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10CountriesData ? Top10CountriesData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                    }
+                    
+                </Col> */}
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
-                    <BarChartComponent barChartData={RegionData} />
+
+                    {
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10StatesData ? Top10StatesData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                    }
+                    
                 </Col>
             </Row>
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement } from 'chart.js';
+import { Chart as ChartTS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { ChartTypeRegistry, Point, BubbleDataPoint } from 'chart.js';
 
-ChartJS.register(
+ChartTS.register(
   CategoryScale,
   LinearScale,
   PointElement,
@@ -12,7 +14,9 @@ ChartJS.register(
   Legend, 
   BarController,
   BarElement,
-  ArcElement
+  ArcElement,
+  ChartDataLabels
+  
 );
 
 interface StackedBarChart {
@@ -61,10 +65,13 @@ const defaultStackedBarChart: StackedBarChart = {
 };
 
 const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarChart> }> = ({ stackedBarChart = {} }) => {
+
+
   const {
     labels = defaultStackedBarChart.labels,
     datasets = defaultStackedBarChart.datasets,
   } = stackedBarChart;
+
 
   const chartData = {
     labels,
@@ -82,7 +89,57 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
       },
       legend: {
         position: 'top' as const,
+        labels: {
+          generateLabels: (chart: ChartTS<keyof ChartTypeRegistry, (number | [number, number] | Point | BubbleDataPoint )[]>) => {
+            const original = ChartTS.defaults.plugins.legend.labels.generateLabels;
+            const labelsOriginal = original.call(ChartTS.defaults.plugins.legend.labels, chart);
+            labelsOriginal.forEach((label) => {
+              const datasetMeta = chart.getDatasetMeta(label?.datasetIndex ?? 0);
+              label.hidden = !chart.isDatasetVisible(label.datasetIndex ?? 0);
+ // @ts-ignore
+              label.datasetMeta = datasetMeta;
+            });
+            return labelsOriginal;
+          }
+        },
+        onClick: (_e: any, legendItem: { datasetIndex: any; }, legend: { chart: any; }) => {
+          const index = legendItem.datasetIndex;
+          const ci = legend.chart;
+          ci.getDatasetMeta(index).hidden = ci.isDatasetVisible(index);
+          ci.update();
+        }
       },
+      datalabels: {
+        display: (context: any) => {
+          const chart = context.chart;
+          const datasetIndex = context.datasetIndex;
+          const dataIndex = context.dataIndex;
+          const meta = chart.getDatasetMeta(datasetIndex);
+          const visibleDatasetMetas = chart.getSortedVisibleDatasetMetas();
+          if (meta.index === visibleDatasetMetas[visibleDatasetMetas.length - 1].index) {
+            return true;
+          }
+          return false;
+        },
+        anchor: 'end' as const,
+        align: 'end' as const,
+        color: 'black',
+        font: {
+          weight: 'bold' as const,
+          size: 10 // Set the font size of data labels
+        },
+        formatter: (_value: any, context: any) => {
+          const chart = context.chart;
+          const dataIndex = context.dataIndex;
+          const total = chartData.datasets.reduce((sum, dataset, datasetIndex) => {
+            if (chart.isDatasetVisible(datasetIndex)) {
+              return sum + dataset.data[dataIndex];
+            }
+            return sum;
+          }, 0);
+          return total;
+        }
+      }
     },
     responsive: true,
     scales: {
@@ -94,8 +151,8 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
       },
     },
   };
-
-  return <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} />;
+ // @ts-ignore
+  return <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} plugins={[ChartDataLabels]} />;
 };
 
 export default StackedBarChartComponent;

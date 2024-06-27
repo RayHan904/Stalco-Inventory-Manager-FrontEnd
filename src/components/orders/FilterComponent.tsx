@@ -115,7 +115,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
           </div>
         </Form.Group>
       </Row>
-      <Row className="sub-row" md={12}>
+      {/* <Row className="sub-row" md={12}>
         <Form.Group>
           <Form.Label>Country</Form.Label>
           <Select
@@ -144,7 +144,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
             styles={customStyles}
           />
         </Form.Group>
-      </Row>
+      </Row> */}
       <Row className="sub-row" md={12}>
         <Button onClick={handleApplyFilter} style={{ width: '50%', margin: '0 auto' }}>Apply Filter</Button>
       </Row>

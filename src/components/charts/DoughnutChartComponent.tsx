@@ -1,6 +1,9 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Tooltip } from 'react-bootstrap';
+
 Chart.register(ArcElement);
 
 interface PieChartData {
@@ -46,9 +49,20 @@ const DoughnutChartComponent: React.FC<{ doughnutChartData?: Partial<PieChartDat
 
   const options = {
     cutout: '70%', // This makes the chart a donut
+    plugins: {
+      datalabels: {
+        display: true,
+        color: 'white',
+        formatter: (value: number) => value, // Display the value
+        
+      },
+      tooltip: {
+        enabled: false,
+      }
+    },
   };
 
-  return <Doughnut  data={chartData} options={options} />;
+  return <Doughnut  data={chartData} options={options}   />;
 };
 
 export default DoughnutChartComponent;

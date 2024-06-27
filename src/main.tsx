@@ -22,8 +22,9 @@ if (!rootElement) {
 
 const router = (
   <SelectedCustomerProvider>
-    <OrdersDashboardDataProvider>
     <CustomersProvider>
+
+    <OrdersDashboardDataProvider>
     <LoadingProvider>
   <BrowserRouter>
     <Routes>
@@ -38,8 +39,9 @@ const router = (
     </Routes>
   </BrowserRouter>
   </LoadingProvider>
-  </CustomersProvider>
   </OrdersDashboardDataProvider>
+  </CustomersProvider>
+
   </SelectedCustomerProvider>
 
 );

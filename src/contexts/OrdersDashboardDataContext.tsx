@@ -3,8 +3,9 @@ import { addDays } from 'date-fns';
 import useOrdersData from '../hooks/useOrdersData';
 import useLoading from '../hooks/useLoading'
 import { OrdersData } from '../services/api';
-import { DynamicData, Order, Top10BarChartData } from '../components/orders/OrdersDashboardComponent';
-import { filterOrders, transformOrdersDataForOrderVolumeByRegionPerDate, transformOrdersDataForTop10OrdersConfirmed } from '../utils/dataTransformatinos';
+import { DynamicData, Order, Top10BarChartData, WHLvsClaysonData, WhiteLabelData, regionShipped } from '../components/orders/OrdersDashboardComponent';
+import { filterOrders, filterRegionShipped, transformOrdersDataForOrderVolumeByRegionPerDate, transformOrdersDataForTop10OrdersByCountry, transformOrdersDataForTop10OrdersByState, transformOrdersDataForTop10OrdersConfirmed, transformOrdersDataForWHLAndClayson, transformOrdersDataForWhiteLabel } from '../utils/dataTransformatinos';
+import { useCustomers } from './CustomerContext';
 
 export interface DateRange {
   startDate: Date;
@@ -35,6 +36,10 @@ interface DataContextType {
   dynamicData:DynamicData | null | undefined;
   ordersData: OrdersData | null;
   top10OrdersConfimredByCustomer: Top10BarChartData | null | undefined;
+  countryShipped: Top10BarChartData | null | undefined;
+  stateShipped: Top10BarChartData | null | undefined;
+  WHLvsClaysonData: WHLvsClaysonData | null | undefined;
+  WhiteLabelData: WhiteLabelData | null | undefined;
   isOrdersDataLoading:  boolean;
 }
 
@@ -47,11 +52,13 @@ interface DataProviderProps {
 export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ children }) => {
     const { ordersData, isOrdersDataLoading, fetchOrdersDatawithRange } = useOrdersData();
     const { isLoading: isFilterdOrdersDataLoading, startLoading: startFilterdOrdersDataLoading, stopLoading: stopFilterdOrdersDataLoading } = useLoading();
+    const {customersData} = useCustomers();
 
 
   const [filteredOrdersData, setFilterdOrdersData] = useState<Order[]>([]);
+  const [filteredRegionShippedData, setfilteredRegionShippedData] = useState<regionShipped[]>([]);
   const [selectedCustomerNames, setSelectedCustomerNames] = useState<any[]>([]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>(['US', 'INTERNAL', 'CA', 'INTL']);
   const [selectedCountries, setSelectedCountries] = useState<any[]>([]);
   const [selectedStates, setSelectedStates] = useState<any[]>([]);
   const [dateRange, setDateRange] = useState<DateRange>(
@@ -63,28 +70,50 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
   );
   const [dynamicData, setDynamicData] = useState<DynamicData | null>()
   const [top10OrdersConfimredByCustomer, setTop10OrdersConfimredByCustomer] = useState<Top10BarChartData | null>()
+  const [WHLvsClaysonData, setWHLvsClaysonData] = useState<WHLvsClaysonData | null>()
+  const [WhiteLabelData, setWhiteLabelData] = useState<WhiteLabelData | null>()
+  const [countryShipped, setCountryShipped] = useState<Top10BarChartData | null>()
+  const [stateShipped, setStateShipped] = useState<Top10BarChartData | null>()
 
 
 
   useEffect(() => {
+
     setDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByRegionPerDate(ordersData.dbData.orders) : null);
-    setTop10OrdersConfimredByCustomer(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersConfirmed(ordersData.dbData.orders) : null);
+    setTop10OrdersConfimredByCustomer(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersConfirmed(ordersData.dbData.orders,customersData ) : null);
+    setWHLvsClaysonData(!isOrdersDataLoading && ordersData ? transformOrdersDataForWHLAndClayson(ordersData.dbData.orders) : null);
+    setWhiteLabelData(!isOrdersDataLoading && ordersData ? transformOrdersDataForWhiteLabel(ordersData.dbData.orders) : null);
+    setCountryShipped(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersByCountry(ordersData.dbData.regionShipped) : null);
+    setStateShipped(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersByState(ordersData.dbData.regionShipped) : null);
+console.log("Countries",countryShipped);
 }, [ordersData]);
 
 const handleApplyFilter = async () => {
     startFilterdOrdersDataLoading();
+    console.log("Countries",countryShipped);
 
     const filteredData : Order[] =  filterOrders({
         dateRange,
         selectedRegions,
         selectedCustomerNames
     }, ordersData?.dbData.orders)
+    const filteredRegionData : regionShipped[] =  filterRegionShipped({
+        dateRange,
+        selectedRegions,
+        selectedCustomerNames
+    }, ordersData?.dbData.regionShipped)
+
 
     setFilterdOrdersData(filteredData);
+    setfilteredRegionShippedData(filteredRegionData);
 
     setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerDate(filteredData))
-    setTop10OrdersConfimredByCustomer( filteredData && transformOrdersDataForTop10OrdersConfirmed(filteredData))
-    console.log("HERE is ", top10OrdersConfimredByCustomer)
+    setTop10OrdersConfimredByCustomer( filteredData && transformOrdersDataForTop10OrdersConfirmed(filteredData, customersData))
+    setWHLvsClaysonData( filteredData && transformOrdersDataForWHLAndClayson(filteredData))
+    setWhiteLabelData( filteredData && transformOrdersDataForWhiteLabel(filteredData))
+    setCountryShipped( filteredRegionData && transformOrdersDataForTop10OrdersByCountry(filteredRegionData) )
+    setStateShipped( filteredRegionData && transformOrdersDataForTop10OrdersByState(filteredRegionData) )
+    console.log("HERE is ", selectedRegions)
 
     stopFilterdOrdersDataLoading();
 }
@@ -141,6 +170,10 @@ const handleApplyFilter = async () => {
     handleApplyFilter,
     dynamicData, 
     top10OrdersConfimredByCustomer,
+    countryShipped,
+    stateShipped,
+    WHLvsClaysonData,
+    WhiteLabelData,
     ordersData, 
     isOrdersDataLoading
   };

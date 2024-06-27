@@ -1,7 +1,6 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement, ChartOptions } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Top10BarChartData } from '../orders/OrdersDashboardComponent';
 
 ChartJS.register(
@@ -19,7 +18,7 @@ ChartJS.register(
 
 interface BarChartData {
   labels: string[];
-  label: string;
+  title: string;
   data: number[];
   backgroundColor: string[];
   hoverBackgroundColor: string[];
@@ -31,7 +30,7 @@ interface BarChartData {
 
 const defaultBarChartData: BarChartData = {
   labels: ['Clayson', 'WHL'],
-  label: "# of units",
+  title: "# of units",
   data: [0, 0],
   backgroundColor: ['#FF6384', '#36A2EB'],
   hoverBackgroundColor: ['#d35671', '#2d8ccd'],
@@ -47,7 +46,7 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
 
   const {
     labels = defaultBarChartData.labels,
-    label = defaultBarChartData.label,
+    title = defaultBarChartData.title,
     data = defaultBarChartData.data,
     backgroundColor = defaultBarChartData.backgroundColor,
     hoverBackgroundColor = defaultBarChartData.hoverBackgroundColor,
@@ -57,11 +56,13 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
     minHeight: chartMinHeight = defaultBarChartData.minHeight,
   } = safeBarChartData;
 
+  // Truncate labels if they are too long
+  const truncatedLabels = labels.map(label => label.length > 8 ? `${label.slice(0, 5)}...` : label);
+
   const chartData = {
-    labels,
+    labels: truncatedLabels,
     datasets: [
       {
-        label,
         data,
         backgroundColor,
         hoverBackgroundColor,
@@ -76,7 +77,7 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
     // Sort by data in ascending order
     combined.sort((a, b) => b.data - a.data);
     // Separate labels and data after sorting
-    chartData.labels = combined.map(item => item.label);
+    chartData.labels = combined.map(item => item.label.length > 8 ? `${item.label.slice(0, 5)}...` : item.label);
     chartData.datasets[0].data = combined.map(item => item.data);
   }
 
@@ -84,22 +85,40 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
     responsive: true,
     indexAxis: indexAxis === 'y' ? 'y' : 'x', // This option makes the bar chart horizontal
     maintainAspectRatio: false,
-    plugins: dataLabel ? {
+  
+
+
+    plugins: {
       datalabels: {
-        anchor: 'end',
-        align: 'end',
+        anchor: dataLabel ? 'end' : undefined,
+        align: dataLabel ? 'end' : undefined,
         color: 'black',
         font: {
           weight: 'bold',
-          size: 10 // Set the font size of data labels
+          size: dataLabel ? 10 : undefined,
+        },
+      },
+      tooltip: {
+        enabled: false,
+      },
+      title: {
+        display: true,
+        text: title,
+        font: {
+          size: 12,
+          style: 'italic'
         }
-      }
-    } : {}
+      },
+      legend: {
+        display: false,
+      },
+    },
+    
   };
 
   return (
     <div style={{ height: height, minHeight: minHeight ?? chartMinHeight }}>
-      <Bar data={chartData} options={options} plugins={dataLabel ? [ChartDataLabels] : []} />
+      <Bar data={chartData} options={options}  />
     </div>
   );
 };
