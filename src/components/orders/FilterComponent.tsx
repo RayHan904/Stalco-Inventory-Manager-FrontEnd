@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Form, Button } from 'react-bootstrap';
+import { Row, Form, Button, Col } from 'react-bootstrap';
 import Select, { StylesConfig, MultiValue } from 'react-select';
 import MyDateRangePicker from './DateRangePicker';
 import CustomOption from './CustomOption';
@@ -32,6 +32,12 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     selectedRegions,
     selectedCountries,
     selectedStates,
+    handleCarrierToggle,
+    handleCountryToggle,
+    handleDailyToggle,
+    isCarrier,
+    isCountry,
+    isDaily,
     dateRange,
     handleApplyFilter,
     handleSelectCustomerNames,
@@ -77,6 +83,8 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     return selectedOptions;
   };
 
+  let disabled = false
+
   return (
     <>
       <Row className="sub-row" md={12}>
@@ -105,16 +113,56 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
             {regionsOptions.map((region) => (
               <Form.Check
                 type="checkbox"
+                disabled= {isCarrier}
                 key={region}
                 label={region}
                 value={region}
-                checked={selectedRegions.includes(region)}
+                checked={isCarrier ? true :selectedRegions.includes(region)}
                 onChange={() => handleSelectRegions(region)}
               />
             ))}
           </div>
         </Form.Group>
       </Row>
+      <Row className="sub-row" md={12}>
+        <Col>
+        <Form.Group>
+          <div className="inline-checkbox">
+              <Form.Check
+                type="switch"
+                label="By Carrier"
+                checked={isCarrier}
+                onChange={() => handleCarrierToggle(!isCarrier)}
+              />
+          </div>
+        </Form.Group>
+        </Col>
+        <Col>
+        <Form.Group>
+          <div className="inline-checkbox">
+              <Form.Check
+                type="switch"
+                label="Daily"
+                checked={isDaily}
+                onChange={() => handleDailyToggle(!isDaily)}
+              />
+          </div>
+        </Form.Group>
+        </Col>
+
+      </Row>
+      <Row className="sub-row" md={12}>
+        <Form.Group>
+          <div className="inline-checkbox">
+              <Form.Check
+                type="switch"
+                label="by Country"
+                checked={isCountry}
+                onChange={() => handleCountryToggle(!isCountry)}
+              />
+          </div>
+        </Form.Group>
+        </Row>
       {/* <Row className="sub-row" md={12}>
         <Form.Group>
           <Form.Label>Country</Form.Label>

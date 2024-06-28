@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, ListGroup } from 'react-bootstrap';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 
@@ -48,6 +48,7 @@ export interface Dataset {
     label: string;
     data: number[];
     backgroundColor: string;
+    borderColor: string;
     hoverBackgroundColor: string;
     borderWidth: number;
 }
@@ -58,6 +59,17 @@ export interface DynamicData {
     totalCa? :number,
     totalInternal? :number,
     totalIntl? :number,
+    labels: string[];
+    datasets: Dataset[];
+}
+export interface ByCarrierDynamicData {
+    totalOrders? :number,
+    totalUSPS? :number,
+    totalDHL? :number,
+    totalCP? :number,
+    totalFEDEX? :number,
+    totalUPS? :number,
+    totalOthers? :number,
     labels: string[];
     datasets: Dataset[];
 }
@@ -112,9 +124,12 @@ const OrdersDashboardComponent: React.FC = () => {
 
     const {
         dynamicData,
+        byCarrierDynamicData,
         top10OrdersConfimredByCustomer,
         countryShipped,
         stateShipped,
+        displayCarriersInfo,
+        isDisplayByCountry,
         WHLvsClaysonData,
         WhiteLabelData,
         isFilterdOrdersDataLoading,
@@ -154,9 +169,9 @@ const OrdersDashboardComponent: React.FC = () => {
         title: countryShipped? countryShipped.title : "# of orders",
         data: countryShipped? countryShipped.data: [130, 190, 183, 139, 149, 230, 173, 149, 210, 170],
         backgroundColor: [
-             '#FF9F40'
+             '#FFCE56'
         ],
-        hoverBackgroundColor: [ '#d48136',
+        hoverBackgroundColor: [ '#d4b446',
            
         ],
         borderWidth: 1,
@@ -177,7 +192,6 @@ const OrdersDashboardComponent: React.FC = () => {
         indexAxis: 'y',
         height: '20rem'
     }
-console.log("TYPE of static!", Top10BarchartData)
 
 
     const customStyles = {
@@ -203,6 +217,10 @@ console.log("TYPE of static!", Top10BarchartData)
     const dataLabelTop10 = true;
 
     const isArranged = true;
+    const isLoading = isOrdersDataLoading || isFilterdOrdersDataLoading;
+    const dataToShow = displayCarriersInfo ? byCarrierDynamicData : dynamicData;
+    const shouldShowLineChart = dataToShow && dataToShow.labels && dataToShow.labels.length >= 32;
+
     return (
         <Container>
 
@@ -214,22 +232,32 @@ console.log("TYPE of static!", Top10BarchartData)
         stateOptions={ordersData?.dbData.filterOptions?.stateOptions }
         customStyles={customStyles}
     />
+    <Row className="sub-row" md={12}>
+    <ListGroup>
+    <ListGroup.Item>
+      Total Inventory Sold: 
+    </ListGroup.Item>
+    <ListGroup.Item>
+      Average Units per Order: 
+    </ListGroup.Item>
+    </ListGroup>
+    </Row>
 </Col>
 
 
 
 
 <Col xs={12} md={9}>
-
-    {isOrdersDataLoading || isFilterdOrdersDataLoading? <div><Loader dims={75}/> </div> : dynamicData && dynamicData.labels.length >= 31 ? (
-        <LineChartComponent {...(dynamicData ? { lineChart: dynamicData } : {})} />
-    ) : (
-        <StackedBarChartComponent {...(dynamicData ? { stackedBarChart: dynamicData } : {})} />
-    )}
-</Col>
+            {isLoading ? (
+                <div><Loader dims={75} /></div>
+            ) : shouldShowLineChart && dataToShow ? (
+                <LineChartComponent lineChart={dataToShow} />
+            ) : dataToShow ? (
+                <StackedBarChartComponent stackedBarChart={dataToShow} />
+            ) : null}
+        </Col>
             </Row>
-
-            <Row style={{ display: 'flex', justifyContent: 'space-between', margin:"1rem 0" }}>
+ {!displayCarriersInfo ? <Row style={{ display: 'flex', justifyContent: 'space-between', margin:"1rem 0" }}>
                 <Col xs={6} md={2} >
                     <InfoCardComponent cardTitle='Total Orders' text={dynamicData ? dynamicData.totalOrders : "-"} width='100%' />
                 </Col>
@@ -245,7 +273,24 @@ console.log("TYPE of static!", Top10BarchartData)
                 <Col xs={6} md={2}>
                     <InfoCardComponent cardTitle='Internal ' text={dynamicData ? dynamicData.totalInternal : "-"} width='100%' />
                 </Col>
-            </Row>
+            </Row> : <Row style={{ display: 'flex', justifyContent: 'space-between', margin:"1rem 0" }}>
+                <Col xs={6} md={2} >
+                    <InfoCardComponent cardTitle='Total Orders' text={byCarrierDynamicData ? byCarrierDynamicData.totalOrders : "-"} width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='USPS' text={byCarrierDynamicData ? byCarrierDynamicData.totalUSPS : "-"} width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='DHL' text={byCarrierDynamicData ? byCarrierDynamicData.totalDHL : "-"} width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='Canada Post ' text={byCarrierDynamicData ? byCarrierDynamicData.totalCP : "-"} width='100%' />
+                </Col>
+                <Col xs={6} md={2}>
+                    <InfoCardComponent cardTitle='Others ' text={byCarrierDynamicData ? ((byCarrierDynamicData.totalFEDEX ?? 0) + (byCarrierDynamicData.totalOthers ?? 0) + (byCarrierDynamicData.totalUPS ?? 0)) : "-"} width='100%' />
+                </Col>
+            </Row> }
+            
             <hr />
             <Row className="custom-row">
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
@@ -275,7 +320,7 @@ console.log("TYPE of static!", Top10BarchartData)
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
 
                     {
-                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10StatesData ? Top10StatesData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={isDisplayByCountry ? Top10CountriesData : Top10StatesData} dataLabel={dataLabelTop10} isArranged={isArranged} />
                     }
                     
                 </Col>

@@ -62,7 +62,23 @@ const defaultStackedBarChart: StackedBarChart = {
       borderWidth: 2, // Increase line thickness
       fill: false,
       pointRadius: 0, // Hide points
-    }
+    },
+    {
+      label: "# of units (Dataset 4)",
+      data: [0, 0, 0, 0],
+      borderColor: '#4BC0C0',
+      borderWidth: 2, // Increase line thickness
+      fill: false,
+      pointRadius: 0, // Hide points
+    },
+    {
+      label: "# of units (Dataset 4)",
+      data: [0, 0, 0, 0],
+      borderColor: '#4BC0C0',
+      borderWidth: 2, // Increase line thickness
+      fill: false,
+      pointRadius: 0, // Hide points
+    },
   ],
 };
 
@@ -105,19 +121,15 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
       },
     },
     responsive: true,
-    scales: {
-      y: {
-        display: true,
-        min: 0, // Set minimum value for Y-axis
-        max: suggestedMax, // Set dynamic maximum value for Y-axis
-      },
-      x: {
-        display: true,
-      },
-    },
+
   };
 
-  return <Line style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} />;
-};
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <div style={{ width: '100% ', minWidth:'800px', minHeight: '400px' }}> {/* Adjust width as needed */}
+        <Line data={chartData} options={options} />
+      </div>
+    </div>
+  );};
 
 export default LineChartComponent;
