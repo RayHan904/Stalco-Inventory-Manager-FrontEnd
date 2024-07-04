@@ -206,13 +206,18 @@ export async function fetchThreshold() {
     }
   }
 
-  export const fetchOrdersDataByRange = async () => {
+  export const fetchOrdersDataByRange = async (startDate: Date, endDate: Date) => {
     try {
-      console.log("FETCHING ORDERS DATA BY RANGE")
-      const response = await axios.get(BASE_URL + ORDERS_URL);
+      console.log("FETCHING ORDERS DATA BY RANGE");
+      const response = await axios.get(`${BASE_URL}${ORDERS_URL}/date-range`, {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        }
+      });
       return response.data;
     } catch (error) {
-      console.error("Error fetching Orders data by range:",error);
+      console.error("Error fetching Orders data by range:", error);
       throw error;
     }
-  }
+  };

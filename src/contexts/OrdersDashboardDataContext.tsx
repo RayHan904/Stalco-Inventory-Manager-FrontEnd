@@ -25,7 +25,7 @@ interface DataContextType {
   dateRange: DateRange;
   setDateRange: React.Dispatch<React.SetStateAction<DateRange>>;
   filteredOrdersData: any; 
-  fetchOrdersDatawithRange: () => void; 
+  fetchOrdersDatawithRange: (startDate: Date, endDate: Date) => void; 
   isFilterdOrdersDataLoading: boolean;
   handleSelectCustomerNames: (selectedOptions: any) => void;
   handleSelectRegions: (region: string) => void;
@@ -65,6 +65,12 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     const {customersData} = useCustomers();
 
     const yesterday = subDays(new Date(), 1);
+    const now = new Date();
+    const dayB4Yesterday = new Date(now);
+    dayB4Yesterday.setDate(dayB4Yesterday.getDate() - 2);
+    const sixMonthsAgoFromYesterday = new Date(dayB4Yesterday);
+    sixMonthsAgoFromYesterday.setMonth(sixMonthsAgoFromYesterday.getMonth() - 6);
+    
 
   const [filteredOrdersData, setFilterdOrdersData] = useState<Order[]>([]);
   const [filteredRegionShippedData, setfilteredRegionShippedData] = useState<regionShipped[]>([]);
@@ -90,6 +96,7 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
   const [WhiteLabelData, setWhiteLabelData] = useState<WhiteLabelData | null>()
   const [countryShipped, setCountryShipped] = useState<Top10BarChartData | null>()
   const [stateShipped, setStateShipped] = useState<Top10BarChartData | null>()
+  const [prevDateRange, setPrevDateRange] = useState<DateRange | null>({startDate: sixMonthsAgoFromYesterday, endDate: new Date(now),  key: 'selection',});
 
 
 
@@ -102,17 +109,28 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     setWhiteLabelData(!isOrdersDataLoading && ordersData ? transformOrdersDataForWhiteLabel(ordersData.dbData.orders) : null);
     setCountryShipped(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersByCountry(ordersData.dbData.regionShipped) : null);
     setStateShipped(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersByState(ordersData.dbData.regionShipped) : null);
-    console.log("DATE RANGE: ", dateRange)
-console.log("Countries",countryShipped);
 }, [ordersData]);
 
 const handleApplyFilter = async () => {
     startFilterdOrdersDataLoading();
+    const isWithingPrevDateRange = (startDate: Date, endDate: Date): boolean => {
+     if(prevDateRange) {
+      return startDate >= prevDateRange?.startDate && endDate <= prevDateRange?.endDate;
+     } 
+    else return false;
+  };
+
+  const { startDate, endDate } = dateRange;
+  
+  if (!isWithingPrevDateRange(startDate, endDate)) {
+      await fetchOrdersDatawithRange(startDate, endDate)
+      setPrevDateRange({startDate: startDate, endDate: endDate, key: 'selection',} )
+  }
+
+    console.log(dateRange)
     setDisplayCarriersInfo(isCarrier);
     setIsDisplayByCountry(isCountry);
     setIsDisplayDaily(isDaily);
-
-
 
     const filteredData : Order[] =  filterOrders({
         dateRange,
@@ -136,9 +154,9 @@ const handleApplyFilter = async () => {
     setWhiteLabelData( filteredData && transformOrdersDataForWhiteLabel(filteredData))
     setCountryShipped( filteredRegionData && transformOrdersDataForTop10OrdersByCountry(filteredRegionData) )
     setStateShipped( filteredRegionData && transformOrdersDataForTop10OrdersByState(filteredRegionData) )
-    console.log("HERE is ", selectedRegions)
 
     stopFilterdOrdersDataLoading();
+    console.log("DATE range current:", prevDateRange)
 }
 
   const handleSelectCustomerNames = (selectedOptions: any) => {
@@ -171,7 +189,6 @@ const handleApplyFilter = async () => {
   const handleDateRangeChange = (ranges: { [key: string]: DateRange }) => {
     const newSelection = ranges.selection;
     if (newSelection && newSelection.startDate && newSelection.endDate) {
-      console.log('New selection:', newSelection);
       setDateRange({
         startDate: newSelection.startDate,
         endDate: newSelection.endDate,

@@ -85,9 +85,13 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
     responsive: true,
     indexAxis: indexAxis === 'y' ? 'y' : 'x', // This option makes the bar chart horizontal
     maintainAspectRatio: false,
-  
-
-
+    scales: {
+      [indexAxis === 'y' ? 'x' : 'y']: {
+        afterDataLimits: (scale) => {
+          scale.max += (scale.max - scale.min) * 0.1; // Add 10% to the maximum value
+        },
+      },
+    },
     plugins: {
       datalabels: {
         anchor: dataLabel ? 'end' : undefined,
@@ -97,9 +101,21 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
           weight: 'bold',
           size: dataLabel ? 10 : undefined,
         },
+        formatter: (value) => value.toLocaleString(),
       },
       tooltip: {
-        enabled: false,
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.raw !== null ) {
+              label += context.raw && context.raw.toLocaleString();
+            }
+            return label;
+          }
+        }
       },
       title: {
         display: true,
@@ -113,12 +129,11 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
         display: false,
       },
     },
-    
   };
 
   return (
     <div style={{ height: height, minHeight: minHeight ?? chartMinHeight }}>
-      <Bar data={chartData} options={options}  />
+      <Bar data={chartData} options={options} />
     </div>
   );
 };

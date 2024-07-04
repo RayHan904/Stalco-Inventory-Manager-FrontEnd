@@ -15,7 +15,7 @@ const InfoCardComponent: React.FC<{cardTitle: string, text?: string | number, pe
     <Card className="text-center" style={{ width: width, margin: '0 auto', marginBottom: '10px', padding: '3px' }}>
     <Card.Body style={{ padding: '0' }}>
         <Card.Title>{cardTitle}</Card.Title>
-        <Card.Text> {text && text} {text && perc && "-"} {perc && <strong>{perc}</strong>} </Card.Text>
+        <Card.Text> {text && text.toLocaleString()} {text && perc && "-"} {perc && <strong>{perc}</strong>} </Card.Text>
     </Card.Body>
 </Card>
   );

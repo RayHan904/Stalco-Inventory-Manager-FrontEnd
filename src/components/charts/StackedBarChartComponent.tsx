@@ -1,22 +1,21 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartTS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ChartTypeRegistry, Point, BubbleDataPoint } from 'chart.js';
 
-ChartTS.register(
+ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
-  Legend, 
+  Legend,
   BarController,
   BarElement,
   ArcElement,
   ChartDataLabels
-  
 );
 
 interface StackedBarChart {
@@ -65,13 +64,10 @@ const defaultStackedBarChart: StackedBarChart = {
 };
 
 const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarChart> }> = ({ stackedBarChart = {} }) => {
-
-
   const {
     labels = defaultStackedBarChart.labels,
     datasets = defaultStackedBarChart.datasets,
   } = stackedBarChart;
-
 
   const chartData = {
     labels,
@@ -86,17 +82,29 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
       tooltip: {
         mode: 'index' as const,
         intersect: false,
+        callbacks: {
+          label: function(context: any) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.raw !== null) {
+              label += context.raw.toLocaleString();
+            }
+            return label;
+          }
+        }
       },
       legend: {
         position: 'top' as const,
         labels: {
-          generateLabels: (chart: ChartTS<keyof ChartTypeRegistry, (number | [number, number] | Point | BubbleDataPoint )[]>) => {
-            const original = ChartTS.defaults.plugins.legend.labels.generateLabels;
-            const labelsOriginal = original.call(ChartTS.defaults.plugins.legend.labels, chart);
+          generateLabels: (chart: ChartJS<keyof ChartTypeRegistry, (number | [number, number] | Point | BubbleDataPoint )[]>) => {
+            const original = ChartJS.defaults.plugins.legend.labels.generateLabels;
+            const labelsOriginal = original.call(ChartJS.defaults.plugins.legend.labels, chart);
             labelsOriginal.forEach((label) => {
               const datasetMeta = chart.getDatasetMeta(label?.datasetIndex ?? 0);
               label.hidden = !chart.isDatasetVisible(label.datasetIndex ?? 0);
- // @ts-ignore
+              // @ts-ignore
               label.datasetMeta = datasetMeta;
             });
             return labelsOriginal;
@@ -137,7 +145,7 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
             }
             return sum;
           }, 0);
-          return total;
+          return total.toLocaleString();
         }
       }
     },
@@ -148,11 +156,18 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
       },
       y: {
         stacked: true,
+        afterDataLimits: (scale: { max: number; min: number; }) => {
+          scale.max += (scale.max - scale.min) * 0.1; // Add 10% to the maximum value
+        },
       },
     },
   };
- // @ts-ignore
-  return <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} plugins={[ChartDataLabels]} />;
+
+  return (
+
+     // @ts-ignore
+    <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} plugins={[ChartDataLabels]} />
+  );
 };
 
 export default StackedBarChartComponent;

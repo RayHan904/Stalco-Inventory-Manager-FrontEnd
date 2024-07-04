@@ -2,9 +2,8 @@ import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { Tooltip } from 'react-bootstrap';
 
-Chart.register(ArcElement);
+Chart.register(ArcElement, ChartDataLabels);
 
 interface PieChartData {
   labels: string[];
@@ -53,16 +52,26 @@ const DoughnutChartComponent: React.FC<{ doughnutChartData?: Partial<PieChartDat
       datalabels: {
         display: true,
         color: 'white',
-        formatter: (value: number) => value, // Display the value
-        
+        formatter: (value: number) => value.toLocaleString(), // Display the value with localeString formatting
       },
       tooltip: {
-        enabled: false,
+        callbacks: {
+          label: function(context: any) {
+            let label = context.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.raw !== null) {
+              label += context.raw.toLocaleString();
+            }
+            return label;
+          }
+        }
       }
     },
   };
 
-  return <Doughnut  data={chartData} options={options}   />;
+  return <Doughnut data={chartData} options={options} />;
 };
 
 export default DoughnutChartComponent;

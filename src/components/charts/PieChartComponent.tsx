@@ -48,7 +48,7 @@ const PieChartComponent: React.FC<{ pieChartData?: Partial<PieChartData> }> = ({
     plugins: {
       datalabels: {
         display: false,
-
+        formatter: (value: number) => value.toLocaleString(),
       },
     },
   };

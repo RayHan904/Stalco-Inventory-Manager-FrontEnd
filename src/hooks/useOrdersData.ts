@@ -27,10 +27,10 @@ const useOrdersData = () => {
     }, []);
 
 
-    const fetchOrdersDatawithRange = async () => {
+    const fetchOrdersDatawithRange = async (startDate: Date, endDate: Date) => {
         startOrdersLoading();
         try {
-            const data: OrdersData = await fetchOrdersDataByRange();
+            const data: OrdersData = await fetchOrdersDataByRange(startDate, endDate);
             setOrdersData(data);
         } catch (error: any) {  // 'any' type can be replaced with a more specific error type if available
             console.error("Error fetching data:", error);
