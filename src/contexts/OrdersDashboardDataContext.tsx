@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import {  subDays, subMonths } from 'date-fns';
+import {  addDays, startOfWeek, subDays, subMonths } from 'date-fns';
 import useOrdersData from '../hooks/useOrdersData';
 import useLoading from '../hooks/useLoading'
 import { OrdersData } from '../services/api';
@@ -69,9 +69,13 @@ export const OrdersDashboardDataProvider: React.FC<DataProviderProps> = ({ child
     const now = new Date();
     const dayB4Yesterday = new Date(now);
     dayB4Yesterday.setDate(dayB4Yesterday.getDate() - 2);
-    const sixMonthsAgoFromYesterday = new Date(dayB4Yesterday);
-    sixMonthsAgoFromYesterday.setMonth(sixMonthsAgoFromYesterday.getMonth() - 6);
+    // const sixMonthsAgoFromYesterday = new Date(dayB4Yesterday);
+    // sixMonthsAgoFromYesterday.setMonth(sixMonthsAgoFromYesterday.getMonth() - 6);
     
+
+    const sixMonthsAgo = subMonths(yesterday, 6);
+const startOfWeekAfterSixMonthsAgo = addDays(startOfWeek(sixMonthsAgo, { weekStartsOn: 1 }), 7); // Adding 7 days to get the start of the next week
+
 
 const [apiCall, setApiCall] = useState<boolean>(false);
   const [filteredOrdersData, setFilterdOrdersData] = useState<Order[]>([]);
@@ -87,7 +91,7 @@ const [apiCall, setApiCall] = useState<boolean>(false);
   const [isDaily , setIsDaily] = useState<boolean>(false);
   const [isDisplayDaily, setIsDisplayDaily] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: subMonths(yesterday, 6),
+    startDate: startOfWeekAfterSixMonthsAgo,
     endDate: yesterday,
     key: 'selection',
   });
@@ -98,14 +102,14 @@ const [apiCall, setApiCall] = useState<boolean>(false);
   const [WhiteLabelData, setWhiteLabelData] = useState<WhiteLabelData | null>()
   const [countryShipped, setCountryShipped] = useState<Top10BarChartData | null>()
   const [stateShipped, setStateShipped] = useState<Top10BarChartData | null>()
-  const [prevDateRange, setPrevDateRange] = useState<DateRange | null>({startDate: sixMonthsAgoFromYesterday, endDate: new Date(now),  key: 'selection',});
+  const [prevDateRange, setPrevDateRange] = useState<DateRange | null>({startDate: startOfWeekAfterSixMonthsAgo, endDate: new Date(now),  key: 'selection',});
 
 
 
   useEffect(() => {
 
-    setDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByRegionPerWeek(ordersData.dbData.orders) : null);
-    setByCarrierDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByCarrierPerWeek(ordersData.dbData.orders) : null);
+    setDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByRegionPerWeek(ordersData.dbData.orders, dateRange) : null);
+    setByCarrierDynamicData(!isOrdersDataLoading && ordersData ? transformOrdersDataForOrderVolumeByCarrierPerWeek(ordersData.dbData.orders, dateRange) : null);
     setTop10OrdersConfimredByCustomer(!isOrdersDataLoading && ordersData ? transformOrdersDataForTop10OrdersConfirmed(ordersData.dbData.orders,customersData ) : null);
     setWHLvsClaysonData(!isOrdersDataLoading && ordersData ? transformOrdersDataForWHLAndClayson(ordersData.dbData.orders) : null);
     setWhiteLabelData(!isOrdersDataLoading && ordersData ? transformOrdersDataForWhiteLabel(ordersData.dbData.orders) : null);
@@ -140,8 +144,8 @@ const handleApplyFilter = async () => {
     setfilteredRegionShippedData(filteredRegionData);
     console.log(filteredRegionShippedData);
 
-   isDaily ?  setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerDate(filteredData)) : setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerWeek(filteredData))
-   isDaily ? setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerDate(filteredData)) : setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerWeek(filteredData))
+   isDaily ?  setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerDate(filteredData, dateRange)) : setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerWeek(filteredData, dateRange))
+   isDaily ? setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerDate(filteredData, dateRange)) : setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerWeek(filteredData, dateRange))
     setTop10OrdersConfimredByCustomer( filteredData && transformOrdersDataForTop10OrdersConfirmed(filteredData, customersData))
     setWHLvsClaysonData( filteredData && transformOrdersDataForWHLAndClayson(filteredData))
     setWhiteLabelData( filteredData && transformOrdersDataForWhiteLabel(filteredData))

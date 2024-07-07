@@ -1,4 +1,4 @@
-import { getISOWeek, parseISO } from "date-fns";
+import { addWeeks, getISOWeek, parseISO, startOfISOWeek } from "date-fns";
 import { ByCarrierDynamicData, DynamicData, Order, Top10BarChartData, WHLvsClaysonData, WhiteLabelData, regionShipped } from "../components/orders/OrdersDashboardComponent";
 import { WHLClientIds, WhiteLabelClientIds } from "../constants";
 import { CustomerData } from "../services/api";
@@ -127,7 +127,8 @@ export const filterRegionShipped = (filter: Filter, data: regionShipped[] | unde
 };
 //Weekly filter and transform for graph
 
-export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]): DynamicData => {
+
+export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[], dateRange: DateRange): DynamicData => {
     const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number } } = {};
 
     let totalOrders = 0;
@@ -135,6 +136,20 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
     let totalCa = 0;
     let totalIntl = 0;
     let totalInternal = 0;
+
+    // Initialize all weeks within the range with zero values
+
+    const currentDate = new Date(dateRange.startDate);
+    const endDate = new Date(dateRange.endDate);
+
+    let currentWeekStart = startOfISOWeek(currentDate);
+    const endWeekStart = startOfISOWeek(endDate);
+
+    while (currentWeekStart <= endWeekStart) {
+        const weekLabel = `${currentWeekStart.getFullYear()}-W${getISOWeek(currentWeekStart).toString().padStart(2, '0')}`;
+        aggregatedData[weekLabel] = { us: 0, canada: 0, internal: 0, intl: 0 };
+        currentWeekStart = addWeeks(currentWeekStart, 1);
+    }
 
     orders.forEach(order => {
         const date = parseISO(order.date);
@@ -222,7 +237,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
     };
 }
 
-export const transformOrdersDataForOrderVolumeByCarrierPerWeek = (orders: Order[]): ByCarrierDynamicData => {
+export const transformOrdersDataForOrderVolumeByCarrierPerWeek = (orders: Order[], dateRange: DateRange): ByCarrierDynamicData => {
     const aggregatedData: { [key: string]: { usps: number, dhl: number, canada_post: number, fedex: number, ups: number, other_carriers: number } } = {};
 
     let totalOrders = 0;
@@ -232,6 +247,16 @@ export const transformOrdersDataForOrderVolumeByCarrierPerWeek = (orders: Order[
     let totalFEDEX = 0;
     let totalUPS = 0;
     let totalOthers = 0;
+
+    // Initialize all weeks within the range with zero values
+    let currentWeekStart = startOfISOWeek(dateRange.startDate);
+    const endWeekStart = startOfISOWeek(dateRange.endDate);
+
+    while (currentWeekStart <= endWeekStart) {
+        const weekLabel = `${currentWeekStart.getFullYear()}-W${getISOWeek(currentWeekStart).toString().padStart(2, '0')}`;
+        aggregatedData[weekLabel] = { usps: 0, dhl: 0, canada_post: 0, fedex: 0, ups: 0, other_carriers: 0 };
+        currentWeekStart = addWeeks(currentWeekStart, 1);
+    }
 
     orders.forEach(order => {
         const date = parseISO(order.date);
@@ -345,39 +370,47 @@ export const transformOrdersDataForOrderVolumeByCarrierPerWeek = (orders: Order[
     };
 }
 //Filter and transform for a graph
-
-export const transformOrdersDataForOrderVolumeByCarrierPerDate = (orders: Order[]): ByCarrierDynamicData =>  {
+export const transformOrdersDataForOrderVolumeByCarrierPerDate = (orders: Order[], dateRange: DateRange): ByCarrierDynamicData =>  {
     const aggregatedData: { [key: string]: { usps: number, dhl: number, canada_post: number, fedex: number, ups: number, other_carriers: number} } = {};
  
     let totalOrders = 0;
-    let totalUSPS=0;
-    let totalDHL= 0;
+    let totalUSPS = 0;
+    let totalDHL = 0;
     let totalCP = 0;
     let totalFEDEX = 0;
     let totalUPS = 0;
     let totalOthers = 0;
 
+    // Initialize all dates within the range with zero values
+    const currentDate = new Date(dateRange.startDate);
+    const endDate = new Date(dateRange.endDate);
+
+    while (currentDate <= endDate) {
+        const dateString = currentDate.toISOString().split('T')[0];
+        aggregatedData[dateString] = { usps: 0, dhl: 0, canada_post: 0, fedex: 0, ups: 0, other_carriers: 0 };
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     orders.forEach(order => {
         if (!aggregatedData[order.date]) {
-            aggregatedData[order.date] = { usps: 0, dhl: 0, canada_post: 0, fedex: 0, ups: 0 , other_carriers: 0 };
+            aggregatedData[order.date] = { usps: 0, dhl: 0, canada_post: 0, fedex: 0, ups: 0, other_carriers: 0 };
         }
-        totalOrders+=order.usps + order.dhl + order.canada_post + order.fedex;
+        totalOrders += order.usps + order.dhl + order.canada_post + order.fedex + order.ups + order.other_carriers;
 
         aggregatedData[order.date].usps += order.usps;
-        totalUSPS+=order.usps;
+        totalUSPS += order.usps;
         aggregatedData[order.date].dhl += order.dhl;
-        totalDHL+=order.dhl;
+        totalDHL += order.dhl;
 
         aggregatedData[order.date].canada_post += order.canada_post;
-        totalCP+=order.canada_post;
+        totalCP += order.canada_post;
 
         aggregatedData[order.date].fedex += order.fedex;
-        totalFEDEX+=order.fedex;
+        totalFEDEX += order.fedex;
         aggregatedData[order.date].ups += order.ups;
-        totalUPS+=order.ups;
+        totalUPS += order.ups;
         aggregatedData[order.date].other_carriers += order.other_carriers;
-        totalOthers+=order.other_carriers;
-
+        totalOthers += order.other_carriers;
     });
 
     const labels = Object.keys(aggregatedData).sort();
@@ -461,32 +494,42 @@ export const transformOrdersDataForOrderVolumeByCarrierPerDate = (orders: Order[
         ],
     };
 }
-export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]): DynamicData =>  {
+
+export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[], dateRange: DateRange): DynamicData =>  {
     const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number } } = {};
  
     let totalOrders = 0;
-    let totalUs=0;
-    let totalCa= 0;
+    let totalUs = 0;
+    let totalCa = 0;
     let totalIntl = 0;
     let totalInternal = 0;
+
+    // Initialize all dates within the range with zero values
+    const currentDate = new Date(dateRange.startDate);
+    const endDate = new Date(dateRange.endDate);
+
+    while (currentDate <= endDate) {
+        const dateString = currentDate.toISOString().split('T')[0];
+        aggregatedData[dateString] = { us: 0, canada: 0, internal: 0, intl: 0 };
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
 
     orders.forEach(order => {
         if (!aggregatedData[order.date]) {
             aggregatedData[order.date] = { us: 0, canada: 0, internal: 0, intl: 0 };
         }
-        totalOrders+=order.us + order.canada + order.internal + order.intl;
+        totalOrders += order.us + order.canada + order.internal + order.intl;
 
         aggregatedData[order.date].us += order.us;
-        totalUs+=order.us;
+        totalUs += order.us;
         aggregatedData[order.date].canada += order.canada;
-        totalCa+=order.canada;
+        totalCa += order.canada;
 
         aggregatedData[order.date].internal += order.internal;
-        totalInternal+=order.internal;
+        totalInternal += order.internal;
 
         aggregatedData[order.date].intl += order.intl;
-        totalIntl+=order.intl;
-
+        totalIntl += order.intl;
     });
 
     const labels = Object.keys(aggregatedData).sort();
@@ -545,6 +588,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]
         ],
     };
 }
+
 export const transformOrdersDataForTop10OrdersConfirmed = (orders: Order[], customers : CustomerData[] | null): Top10BarChartData => {
     // Aggregate total orders by client_id
     const aggregatedOrders = orders.reduce((acc, order) => {
