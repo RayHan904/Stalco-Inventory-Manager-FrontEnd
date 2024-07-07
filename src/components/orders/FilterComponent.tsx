@@ -22,16 +22,14 @@ interface FilterComponentProps {
 const FilterComponent: React.FC<FilterComponentProps> = ({
   customerNamesOptions = [{ value: 'null', label: 'NONE' }],
   regionsOptions =['US', 'CA', 'INTL', 'INTERNAL'],
-  countryOptions =  [{ value: 'null', label: 'NONE' }],
-  stateOptions =  [{ value: 'null', label: 'NONE' }],
+
   customStyles,
 }) => {
 
   const {
     selectedCustomerNames,
     selectedRegions,
-    selectedCountries,
-    selectedStates,
+
     handleCarrierToggle,
     handleCountryToggle,
     handleDailyToggle,
@@ -42,8 +40,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     handleApplyFilter,
     handleSelectCustomerNames,
     handleSelectRegions,
-    handleSelectCountries,
-    handleSelectStates,
+
     handleDateRangeChange,
     setApiCallToggle,
   } = useOrdersDashboardData();
@@ -83,8 +80,6 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     }
     return selectedOptions;
   };
-
-  let disabled = false
 
   return (
     <>

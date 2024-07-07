@@ -138,6 +138,7 @@ const handleApplyFilter = async () => {
 
     setFilterdOrdersData(filteredData);
     setfilteredRegionShippedData(filteredRegionData);
+    console.log(filteredRegionShippedData);
 
    isDaily ?  setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerDate(filteredData)) : setDynamicData( filteredData && transformOrdersDataForOrderVolumeByRegionPerWeek(filteredData))
    isDaily ? setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerDate(filteredData)) : setByCarrierDynamicData( filteredData && transformOrdersDataForOrderVolumeByCarrierPerWeek(filteredData))

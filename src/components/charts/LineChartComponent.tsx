@@ -102,8 +102,8 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
     })),
   };
 
-  const maxDataValue = Math.max(...datasets.flatMap(dataset => dataset.data));
-  const suggestedMax = maxDataValue > 3000 ? maxDataValue + 2000 : 3000;
+  // const maxDataValue = Math.max(...datasets.flatMap(dataset => dataset.data));
+  // const suggestedMax = maxDataValue > 3000 ? maxDataValue + 2000 : 3000;
 
   const options = {
     plugins: {
