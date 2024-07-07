@@ -45,6 +45,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     handleSelectCountries,
     handleSelectStates,
     handleDateRangeChange,
+    setApiCallToggle,
   } = useOrdersDashboardData();
   const selectAllOption = { value: 'select-all', label: 'Select All' };
 
@@ -89,7 +90,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     <>
       <Row className="sub-row" md={12}>
         <Form.Label>Date Range</Form.Label>
-        <MyDateRangePicker dateRange={dateRange} handleDateRangeChange={handleDateRangeChange} />
+        <MyDateRangePicker dateRange={dateRange} handleDateRangeChange={handleDateRangeChange} setApiCallToggle={setApiCallToggle} />
       </Row>
       <Row className="sub-row" md={12}>
         <Form.Group>

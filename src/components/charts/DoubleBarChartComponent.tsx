@@ -60,7 +60,23 @@ const DoubleBarChartComponent: React.FC<{ doubleBarChart?: Partial<DoubleBarChar
     })),
   };
 
-  return <Bar  style={{  height:'100%',margin:'auto'}} data={chartData} />;
+  const options = {
+    plugins: {
+      datalabels: {
+        color: 'black',
+        formatter: (value: number) => value, // Display the value
+        font: {
+          size:innerWidth < 500 ? 8:  10 // Set the font size of data labels
+        },
+      },
+
+
+    },
+    responsive: true,
+
+  };
+
+  return <Bar  style={{  height:'100%',margin:'auto'}} data={chartData} options={options} />;
 };
 
 export default DoubleBarChartComponent;

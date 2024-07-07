@@ -36,13 +36,12 @@ const OrdersDashboard: React.FC = () => {
     }
   };
 
-
   return (
     <div style={{ minHeight: "85vh" }}>
       <Row
         style={{
-          height: overviewShow ? "100%" : "5vh",
-          overflowY: overviewShow ? "visible" : "hidden",
+          height: overviewShow ? (window.innerWidth < 500 ? "95vh" : "auto") : "5vh",
+          overflowY: overviewShow ? "auto" : "hidden",
           transition: "height 0.5s ease-in-out",
         }}
       >

@@ -4,15 +4,17 @@ import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
 import { DateRangePicker, DateRange, StaticRange } from 'react-date-range';
-import { addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
+import { addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, addMonths } from 'date-fns';
 
 
 interface DateRangePickerProps {
   dateRange: DateRange;
   handleDateRangeChange:(ranges: { [key: string]: DateRange; }) => void;
+  setApiCallToggle: () => void;
+
 }
 
-const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDateRangeChange}) => {
+const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDateRangeChange, setApiCallToggle}) => {
 
   const [showCalendar, setShowCalendar] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -23,11 +25,13 @@ const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDa
   };
 
   const handleSelectClick = () => {
+    setApiCallToggle()
     setShowCalendar(false);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
     if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      setApiCallToggle()
       setShowCalendar(false);
     }
   };
@@ -85,16 +89,16 @@ const MyDateRangePicker: React.FC<DateRangePickerProps> = ({dateRange,  handleDa
       endDate: endOfMonth(addDays(new Date(), -30)),
       key: 'lastMonth'
     })),
+    createStaticRange('Last 3 Months', () => ({
+      startDate: startOfMonth(addMonths(new Date(), -3)),
+      endDate: endOfMonth(addMonths(new Date(), -1)),
+      key: 'last3Months'
+    })),
     createStaticRange('This Year', () => ({
       startDate: startOfYear(new Date()),
       endDate: endOfYear(new Date()),
       key: 'thisYear'
     })),
-    createStaticRange('Last Year', () => ({
-      startDate: startOfYear(addDays(new Date(), -365)),
-      endDate: endOfYear(addDays(new Date(), -365)),
-      key: 'lastYear'
-    }))
   ];
 
   return (

@@ -1,3 +1,5 @@
+      // @ts-nocheck
+
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, BarController, BarElement } from 'chart.js';
@@ -134,7 +136,7 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
         color: 'black',
         font: {
           weight: 'bold' as const,
-          size: 10 // Set the font size of data labels
+          size:innerWidth < 500 ? 8:  10 // Set the font size of data labels
         },
         formatter: (_value: any, context: any) => {
           const chart = context.chart;
@@ -164,9 +166,13 @@ const StackedBarChartComponent: React.FC<{ stackedBarChart?: Partial<StackedBarC
   };
 
   return (
+    <div style={{ overflowX: 'auto' }}>
+      <div style={{ width: '100% ', minWidth:'800px', minHeight: '400px' }}> 
+      
+       <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} plugins={[ChartDataLabels]} />
 
-     // @ts-ignore
-    <Bar style={{ width: '100%', margin: 'auto' }} data={chartData} options={options} plugins={[ChartDataLabels]} />
+      </div>
+    </div>
   );
 };
 
