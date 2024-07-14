@@ -2,6 +2,7 @@
 import axios from "axios";
 import { BASE_URL, CUSTOMERS_URL, OFF_SITE_INVENTORY_URL, ORDERS_URL, REPLENISHMENT_URL, SKUINFO_URL } from "../constants";
 import { Order } from "../components/orders/OrdersDashboardComponent";
+import { SkuSales } from "../utils/dataTransformationsByClient";
 
 export interface CustomerData {
     customerId: number;
@@ -14,6 +15,13 @@ dbData:{
   regionShipped: any,
   customers:any,
   filterOptions: any,
+
+}
+  }
+export interface OrdersByClientData {
+dbData:{
+  skusales: SkuSales[];
+
 
 }
   }
@@ -206,10 +214,39 @@ export async function fetchThreshold() {
     }
   }
 
+  export const fetchOrdersByClientData = async (clientId: string) => {
+    try {
+      console.log("FETCHING ORDERS DATA FOR A CLIENxT", clientId)
+
+      const response = await axios.get(BASE_URL + ORDERS_URL + "/last-six-months/ " + clientId);
+      console.log("client responsedata",response.data)
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Orders data:",error);
+      throw error;
+    }
+  }
+
   export const fetchOrdersDataByRange = async (startDate: Date, endDate: Date) => {
     try {
       console.log("FETCHING ORDERS DATA BY RANGE");
       const response = await axios.get(`${BASE_URL}${ORDERS_URL}/date-range`, {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Orders data by range:", error);
+      throw error;
+    }
+  };
+
+  export const fetchOrdersByClientDataByRange = async (startDate: Date, endDate: Date, clientId:string) => {
+    try {
+      console.log("FETCHING ORDERS DATA BY RANGE FOR A CLIENT");
+      const response = await axios.get(`${BASE_URL}${ORDERS_URL}/date-range/${clientId}`, {
         params: {
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),

@@ -25,9 +25,12 @@ import useSkuInfo from "../hooks/useSkuInfo";
 import { validateThreshold } from "../validations/thresholdValidations";
 import { validateQtyPerPallet } from "../validations/qtyPerPalletValidations";
 import BarChartComponent from "../components/charts/BarChartComponent";
+import { useOrdersByClientDashboardData } from "../contexts/OrdersByClientDashboardDataContext";
 
 const CustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();
+  const {fetchOrdersByClient,ordersByClientData } = useOrdersByClientDashboardData()
+  console.log("FETCHED ORDERS",ordersByClientData)
 
   const { isLoading, startLoading, stopLoading } = useLoading(); //while loading inventoryData
   const { replenishmentData, isReplenishmentLoading, setReplenishmentData } = useReplenishment(); //fetching data from Replenishment Collection
@@ -223,6 +226,7 @@ const CustomerDashboard: React.FC = () => {
       try {
         const data = await fetchInventory(selectedCustomer?.customerId);
         await fetchLatestSkuInfo(selectedCustomer?.customerId.toString());
+        fetchOrdersByClient(selectedCustomer.customerId.toString());
         setInventoryData(data);
       } catch (error) {
         console.error("Error fetching data:", error);

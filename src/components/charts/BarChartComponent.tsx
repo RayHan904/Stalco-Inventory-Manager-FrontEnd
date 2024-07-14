@@ -40,7 +40,7 @@ const defaultBarChartData: BarChartData = {
   minHeight: '0'
 };
 
-const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10BarChartData>, dataLabel?: boolean, isArranged?: boolean, minHeight?: string }> = ({ barChartData = {}, dataLabel = false, isArranged = false, minHeight }) => {
+const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10BarChartData>, dataLabel?: boolean, isArranged?: boolean, minHeight?: string, truncateLabels?: boolean }> = ({ barChartData = {}, dataLabel = false, isArranged = false, minHeight, truncateLabels = false }) => {
   // Ensure barChartData is never null or undefined
   const safeBarChartData = barChartData ?? {};
 
@@ -57,10 +57,10 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
   } = safeBarChartData;
 
   // Truncate labels if they are too long
-  const truncatedLabels = labels.map(label => label.length > 8 ? `${label.slice(0, 5)}...` : label);
+  // const truncatedLabels = labels.map(label => label.length > 8 ? `${label.slice(0, 5)}...` : label);
 
   const chartData = {
-    labels: truncatedLabels,
+    labels: labels,
     datasets: [
       {
         data,
@@ -77,7 +77,10 @@ const BarChartComponent: React.FC<{ barChartData?: Partial<BarChartData | Top10B
     // Sort by data in ascending order
     combined.sort((a, b) => b.data - a.data);
     // Separate labels and data after sorting
-    chartData.labels = combined.map(item => item.label.length > 8 ? `${item.label.slice(0, 5)}...` : item.label);
+    if(truncateLabels){
+
+      chartData.labels = combined.map(item => item.label.length > 8 ? `${item.label.slice(0, 5)}...` : item.label);
+    }
     chartData.datasets[0].data = combined.map(item => item.data);
   }
 

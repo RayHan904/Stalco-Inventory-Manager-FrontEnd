@@ -30,7 +30,7 @@ const OrdersDashboard: React.FC = () => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (selectedCustomer) {
-      navigate(`Dashboard/${selectedCustomer.companyName}`);
+      navigate(`/ordersDashboardByCustomer/${selectedCustomer.companyName}`);
     } else {
       toast.error("Please select a customer.");
     }

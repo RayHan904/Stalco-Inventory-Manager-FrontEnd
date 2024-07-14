@@ -11,7 +11,6 @@ import InfoCardComponent from '../common/InfoCardComponent';
 import FilterComponent from './FilterComponent';
 import { useOrdersDashboardData } from '../../contexts/OrdersDashboardDataContext';
 import Loader from '../layout/Loader';
-import useOrdersData from '../../hooks/useOrdersData';
 
 export interface Order {
     client_id: string;
@@ -138,7 +137,6 @@ const OrdersDashboardComponent: React.FC = () => {
 
       } = useOrdersDashboardData();
 
-    const {  } = useOrdersData();
 
 
 
@@ -296,7 +294,7 @@ const OrdersDashboardComponent: React.FC = () => {
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
 
                     {
-                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10BarchartData ? Top10BarchartData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} />
+                        isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={Top10BarchartData ? Top10BarchartData : {}} dataLabel={dataLabelTop10} isArranged={isArranged} truncateLabels={true} />
                     }
                     
                 </Col>

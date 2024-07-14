@@ -13,6 +13,8 @@ import Replenishments from "./screens/Replenishments";
 import { CustomersProvider } from "./contexts/CustomerContext";
 import OrdersDashboard from "./screens/OrdersDashboard";
 import { OrdersDashboardDataProvider } from "./contexts/OrdersDashboardDataContext";
+import OrdresByCustomerDashboard from "./screens/OrdersByCustomerDashboard";
+import { OrdersByClientDashboardDataProvider } from "./contexts/OrdersByClientDashboardDataContext";
 
 const rootElement = document.getElementById("root");
 
@@ -25,6 +27,7 @@ const router = (
     <CustomersProvider>
 
     <OrdersDashboardDataProvider>
+      <OrdersByClientDashboardDataProvider>
     <LoadingProvider>
   <BrowserRouter>
     <Routes>
@@ -34,11 +37,13 @@ const router = (
         <Route path="/ordersDashboard" element={<OrdersDashboard />} />
         {/* <Route path="/orders/:customerName" element={<CustomerDashboard />} />  */}
         <Route path="/Dashboard/:customerName" element={<CustomerDashboard />} /> 
+        <Route path="/ordersDashboardByCustomer/:customerName" element={<OrdresByCustomerDashboard />} /> 
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   </BrowserRouter>
   </LoadingProvider>
+  </OrdersByClientDashboardDataProvider>
   </OrdersDashboardDataProvider>
   </CustomersProvider>
 
