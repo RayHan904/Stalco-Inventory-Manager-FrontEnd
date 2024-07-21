@@ -1,29 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { BsChevronUp, BsChevronDown } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 import { useSelectedCustomer } from "../contexts/SelectedCustomerContext";
-import { useLoading } from "../contexts/LoadingContext";
 
 import Loader from "../components/layout/Loader";
 import SKUList from "../components/common/SKUList";
-import SKUDetail from "../components/common/SKUDetail";
 import BarChartComponent from "../components/charts/BarChartComponent";
 import { useOrdersByClientDashboardData } from "../contexts/OrdersByClientDashboardDataContext";
 import OrdersByClientSummary from "../components/inventory/OrdersByClientSummary";
 import LineChartComponent from "../components/charts/LineChartComponent";
+import SKUOrderDetails from "../components/common/SKUOrderDetails";
+import {  Form } from 'react-bootstrap';
+import MyDateRangePicker from "../components/orders/DateRangePicker";
 
 const OrdersByCustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();
-  const {fetchOrdersByClient,ordersByClientData, top10OrdersConfimredBySku,summary } = useOrdersByClientDashboardData()
-  console.log("FETCHED ORDERS",ordersByClientData)
+  const {ordersByClientData, top10OrdersConfimredBySku,summary, setClientId, dateRange, setApiCallToggle,handleDateRangeChange,isFilterdOrdersDataLoading  } = useOrdersByClientDashboardData()
+  // console.log("FETCHED ORDERS",ordersByClientData)
 
+  const dataToShow = {
 
-
-
-  const { isLoading, startLoading, stopLoading } = useLoading(); //while loading inventoryData
+    labels: ["1st", "2nd", "3rd", "4th", "5th"],
+    datasets: [
+        {
+            label: "# of units",
+            data: [10, 20,30, 23,19],
+            backgroundColor: '#FF6384',
+            borderColor:'#FF6384',
+            hoverBackgroundColor: '#d35671',
+            borderWidth: 2,
+        },
+        {
+            label: "# of orders",
+            data: [8, 20, 24, 20, 10],
+            backgroundColor: '#FFCE56',
+            borderColor:'#FFCE56',
+            hoverBackgroundColor: '#e6b453',
+            borderWidth: 2,
+        }]
+  }
 
   const [searchTerm, setSearchTerm] = useState<string>(""); // Searching from list of SKUs
   const [selectedItem, setSelectedItem] = useState<string>(""); //selected SKU from the list
@@ -31,7 +47,6 @@ const OrdersByCustomerDashboard: React.FC = () => {
   const [listShow, setListShow] = useState(true); //list on mobile view
   const [overviewShow, setOverviewShow] = useState(true); //overview on mobile view
 
-  const navigate = useNavigate();
 
   //helpers
 
@@ -65,22 +80,11 @@ const OrdersByCustomerDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      startLoading();
-      try {
-        console.log("HELLO THERE")
-        await fetchOrdersByClient(selectedCustomer?.customerId.toString());
-
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Error fetching data:");
-        navigate("/ordersDashboard");
-      } finally {
-        stopLoading();
-      }
-    };
-    fetchData();
+    setClientId(selectedCustomer.customerId.toString())
   }, [selectedCustomer]);
+  useEffect(() => {
+    setSelectedItem("")
+  }, [ordersByClientData]);
 
 
   const clearSearch = () => {
@@ -97,6 +101,10 @@ const OrdersByCustomerDashboard: React.FC = () => {
           transition: "height 0.5s ease-in-out",
         }}
       >
+              <Row className="sub-row" md={4}>
+        <Form.Label>Date Range</Form.Label>
+        <MyDateRangePicker dateRange={dateRange} handleDateRangeChange={handleDateRangeChange} setApiCallToggle={setApiCallToggle} />
+      </Row>
         <div className="flex-apart">
           <h1>{selectedCustomer?.companyName}</h1>{" "}
           <div>
@@ -111,11 +119,11 @@ const OrdersByCustomerDashboard: React.FC = () => {
             )}
           </div>
         </div>
-        {isLoading ? (
+        {isFilterdOrdersDataLoading ? (
           <Loader />
         ) : (
           <>
-            <Col md={4} sm={12}>
+            <Col md={4} sm={12} style={{margin:'auto 0'}}>
             {
 
 !top10OrdersConfimredBySku  ? <Loader dims={50}/> : <BarChartComponent barChartData={top10OrdersConfimredBySku ? top10OrdersConfimredBySku : {}} dataLabel={true} isArranged={true} />
@@ -125,11 +133,11 @@ const OrdersByCustomerDashboard: React.FC = () => {
               {summary &&  
              <OrdersByClientSummary summary={summary} width="80%" />
               }</Col>
-            <Col md={5} sm={12}>
+            <Col md={5} sm={12} style={{margin:'auto 0'}}>
             {
 
-!top10OrdersConfimredBySku  ? <Loader dims={50}/> : <BarChartComponent barChartData={top10OrdersConfimredBySku ? top10OrdersConfimredBySku : {}} dataLabel={true} isArranged={true} />
-                    }
+<LineChartComponent lineChart={dataToShow} minHeight='auto' minWidth="auto"/>
+}
             </Col>
           </>
         )}
@@ -141,7 +149,7 @@ const OrdersByCustomerDashboard: React.FC = () => {
             items={filteredItems}
             selectedItem={selectedItem}
             searchTerm={searchTerm}
-            isLoading={isLoading}
+            isLoading={isFilterdOrdersDataLoading}
             onSelect={handleSKUSelect}
             listShow={listShow}
             setListShow={setListShow}
@@ -153,24 +161,14 @@ const OrdersByCustomerDashboard: React.FC = () => {
         {window.innerWidth <= 768 ? <hr /> : <></>}
         <Col lg={9} md={8} sm={6} xs={12} style={{ maxHeight: "70vh", overflowY: "auto" }}>
           <div>
-            {selectedItem ? (
-              <></>
-              // <SKUDetail
-              //   selectedItem={selectedItem}
-              //   details={details[selectedItem] || {}}
-              //   thresholdFieldValue={thresholdFieldValue}
-              //   qtyPerPalletFieldValue={qtyPerPalletFieldValue}
-              //   errMsgThreshold={errMsgThreshold}
-              //   errMsgQtyPerPallet={errMsgQtyPerPallet}
-              //   isReplenishmentLoading={isReplenishmentLoading}
-              //   isSkuInfoLoading={isSkuInfoLoading}
-              //   SKUReplenishmentData={SKUReplenishmentData}
-              //   selectedSkuInfoData={selectedSkuInfoData}
-              //   onThresholdChange={setThresholdFieldValue}
-              //   onQtyPerPalletChange={setQtyPerPalletFieldValue}
-              //   onThresholdSubmit={handleThresholdButtonClick}
-              //   onQtyPerPalletSubmit={handleQtyPerPalletButtonClick}
-              // />
+            {isFilterdOrdersDataLoading ? <Loader/> : selectedItem ? (
+              <>
+              <SKUOrderDetails
+                selectedItem={selectedItem}
+                details={ordersByClientData.dbData.skusales|| {}}
+                dateRange = {dateRange}
+              />
+              </>
             ) : (
               <p>Select an item to view details</p>
             )}

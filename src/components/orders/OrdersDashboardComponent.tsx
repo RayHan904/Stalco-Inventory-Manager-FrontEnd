@@ -316,7 +316,6 @@ const OrdersDashboardComponent: React.FC = () => {
                     
                 </Col> */}
                 <Col xs={12} sm={6} md={4} lg={3} className="custom-col">
-
                     {
                         isOrdersDataLoading || isFilterdOrdersDataLoading? <Loader dims={50}/> : <BarChartComponent barChartData={isDisplayByCountry ? Top10CountriesData : Top10StatesData} dataLabel={dataLabelTop10} isArranged={isArranged} />
                     }

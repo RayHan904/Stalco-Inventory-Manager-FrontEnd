@@ -82,7 +82,7 @@ const defaultStackedBarChart: StackedBarChart = {
   ],
 };
 
-const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = ({ lineChart = {} }) => {
+const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart>, minWidth? : string, minHeight?: string }> = ({ lineChart = {} , minWidth = '800px', minHeight = '400px' }) => {
   const {
     labels = defaultStackedBarChart.labels,
     datasets = defaultStackedBarChart.datasets,
@@ -126,7 +126,7 @@ const LineChartComponent: React.FC<{ lineChart?: Partial<StackedBarChart> }> = (
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <div style={{ width: '100% ', minWidth:'800px', minHeight: '400px' }}> {/* Adjust width as needed */}
+      <div style={{ width: '100% ', minWidth: minWidth, minHeight: minHeight }}> {/* Adjust width as needed */}
         <Line data={chartData} options={options} />
       </div>
     </div>

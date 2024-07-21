@@ -242,6 +242,7 @@ const CustomerDashboard: React.FC = () => {
   const details = inventoryData?.detail || {};
   const summary = inventoryData?.summary || {};
 
+  console.log("HERE are details", details);
   const filteredItems = Object.keys(details).filter((item) =>
     item.toLowerCase().includes(searchTerm.toLowerCase()),
   );

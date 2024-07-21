@@ -1,3 +1,5 @@
+import { format, eachDayOfInterval } from 'date-fns';
+
 export interface SkuSales {
     sku: string;
     date: string;
@@ -23,6 +25,18 @@ interface Top10BarChartData {
     indexAxis: string;
     height: string;
 }
+
+export interface FilteredData {
+    dates: string[];
+    totalOrders: number[];
+    totalUnits: number[];
+    summary: {
+      totalOrders: number;
+      totalUnits: number;
+      avgUnitsPerOrder: number;
+      retailer: string | null;
+    };
+  }
 
 export const transformOrdersDataForTop10SkusOrdered = (skusales: SkuSales[] | null): Top10BarChartData | null => {
     if (!skusales || skusales.length === 0) {
@@ -97,3 +111,82 @@ export function createSummary(skuSales: SkuSales[]): Summary {
         avgUnits,
     };
 }
+
+
+
+export const filterSKUOrderDetails = (
+  details: SkuSales[],
+  selectedSKU: string,
+  startDate: string,
+  endDate: string
+): FilteredData => {
+  // Filter the data for the selected SKU
+  const filteredData = details.filter(data => data.sku === selectedSKU);
+  console.log('Filtered Data:', filteredData);
+
+  // Aggregate total orders and total units by date
+  const aggregatedDataByDate = filteredData.reduce((acc, data) => {
+    if (!acc[data.date]) {
+      acc[data.date] = {
+        date: data.date,
+        total_orders: 0,
+        total_units: 0
+      };
+    }
+    acc[data.date].total_orders += data.total_orders;
+    acc[data.date].total_units += parseFloat(data.total_units);
+    return acc;
+  }, {} as { [key: string]: { date: string; total_orders: number; total_units: number } });
+
+  console.log('Aggregated Data by Date:', aggregatedDataByDate);
+
+  // Generate a list of all dates between start and end date
+  const allDates = eachDayOfInterval({
+    start: new Date(startDate),
+    end: new Date(endDate)
+  }).map(date => format(date, 'yyyy-MM-dd'));
+
+  // Ensure all dates are present in the aggregated data
+  allDates.forEach(date => {
+    if (!aggregatedDataByDate[date]) {
+      aggregatedDataByDate[date] = {
+        date,
+        total_orders: 0,
+        total_units: 0
+      };
+    }
+  });
+
+  // Convert the aggregated data to an array and sort by date
+  const aggregatedDataArray = Object.values(aggregatedDataByDate).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Extract dates, total orders, and total units into separate arrays
+  const dates = aggregatedDataArray.map(data => data.date);
+  const totalOrders = aggregatedDataArray.map(data => data.total_orders);
+  const totalUnits = aggregatedDataArray.map(data => data.total_units);
+
+  // Calculate summary statistics
+  const totalOrdersSum = totalOrders.reduce((sum, val) => sum + val, 0);
+  const totalUnitsSum = totalUnits.reduce((sum, val) => sum + val, 0);
+  const avgUnitsPerOrder = totalOrdersSum === 0 ? 0 : totalUnitsSum / totalOrdersSum;
+  const retailer = filteredData.length > 0 ? filteredData[0].retailer_id : null;
+
+  console.log('Summary:', {
+    totalOrders: totalOrdersSum,
+    totalUnits: totalUnitsSum,
+    avgUnitsPerOrder,
+    retailer
+  });
+
+  return {
+    dates,
+    totalOrders,
+    totalUnits,
+    summary: {
+      totalOrders: totalOrdersSum,
+      totalUnits: totalUnitsSum,
+      avgUnitsPerOrder,
+      retailer
+    }
+  };
+};
