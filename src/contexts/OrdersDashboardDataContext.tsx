@@ -153,7 +153,6 @@ const handleApplyFilter = async () => {
     setStateShipped( filteredRegionData && transformOrdersDataForTop10OrdersByState(filteredRegionData) )
 
     stopFilterdOrdersDataLoading();
-    console.log("DATE range current:", prevDateRange)
 }
 
   const handleSelectCustomerNames = (selectedOptions: any) => {

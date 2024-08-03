@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { ListGroup } from "react-bootstrap";
 import Loader from "../layout/Loader";
 import useLoading from "../../hooks/useLoading";
-import { FilteredData, SkuSales, filterSKUOrderDetails } from "../../utils/dataTransformationsByClient";
+import { FilteredData, SkuSales, filterSKUOrderDetails, filterSKUOrderDetailsByWeek } from "../../utils/dataTransformationsByClient";
 import LineChartComponent from "../charts/LineChartComponent";
-import StackedBarChartComponent from "../charts/StackedBarChartComponent";
 import { DateRange } from "react-date-range";
 import { useOrdersByClientDashboardData } from "../../contexts/OrdersByClientDashboardDataContext";
+import DoubleBarChartComponent from "../charts/DoubleBarChartComponent";
+import { Form } from 'react-bootstrap';
 
 
 interface SKUOrderDetailsProps {
@@ -24,6 +25,8 @@ dateRange,
 
   const { isLoading, startLoading, stopLoading } = useLoading(); //while loading inventoryData
  const [ filteredDetails, setFilteredDetails] = useState<FilteredData | null>();
+ const [showDaily, setShowDaily] = useState<boolean>(false); // for toggling between top10 units and orders 
+
 
  
  const dataToShow = {
@@ -33,7 +36,6 @@ dateRange,
        label: "# of Orders",
        data: filteredDetails?.totalOrders ?? [0],
        backgroundColor: '#FF9F40',
-       borderColor: '#FF9F40',
        hoverBackgroundColor: '#d48136',
        borderWidth: 2,
       },
@@ -41,27 +43,24 @@ dateRange,
         label: "# of units",
         data: filteredDetails?.totalUnits ?? [0],
         backgroundColor: '#9966FF',
-        borderColor: '#9966FF',
         hoverBackgroundColor: '#7d5fcc',
         borderWidth: 2,
       }]
     }
     
     
-    const shouldShowLineChart = dataToShow && dataToShow.labels && dataToShow.labels.length >= 32;
-   console.log("DAET RANGE", dateRange)
+    const shouldShowLineChart = dataToShow && dataToShow.labels && dataToShow.labels.length >= 20;
     
  useEffect(() => {
     const asyncFilter = async () => {
       startLoading();
-        const result = await filterSKUOrderDetails(details, selectedItem, dateRange.startDate.toString(), dateRange.endDate.toString());
+        const result = await showDaily? filterSKUOrderDetails(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem) : filterSKUOrderDetailsByWeek(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem);
         setFilteredDetails(result);
-        console.log("RESULT after filtering ", result)
         stopLoading();
     };
 
     asyncFilter();
-}, [selectedItem]);
+}, [selectedItem,showDaily ]);
     
   return (
     <div>
@@ -87,17 +86,29 @@ dateRange,
 
         </div>
       </div>
-      {isLoading && isFilterdOrdersDataLoading  ? <Loader/> : 
+      {isLoading && isFilterdOrdersDataLoading  ? <Loader/> : <>
+                  <Form.Group>
+                        <div className="inline-checkbox">
+                          <Form.Check
+                            type="switch"
+                            label="Daily"
+                            checked={showDaily}
+                            onChange={() => setShowDaily(!showDaily)}
+                          />
+                        </div>
+                      </Form.Group>
             <div style={{ display: "flex", justifyContent: "center", height: "30rem" }}>
                       {isLoading && isFilterdOrdersDataLoading ? (
                 <div><Loader dims={75} /></div>
             ) : shouldShowLineChart && dataToShow ? (
                 <LineChartComponent lineChart={dataToShow} />
             ) : dataToShow ? (
-                <StackedBarChartComponent stackedBarChart={dataToShow} />
+                <DoubleBarChartComponent doubleBarChart={dataToShow} />
             ) : null}
 
           </div>
+    </>
+
       }
 
     </div>

@@ -11,67 +11,71 @@ import { useOrdersByClientDashboardData } from "../contexts/OrdersByClientDashbo
 import OrdersByClientSummary from "../components/inventory/OrdersByClientSummary";
 import LineChartComponent from "../components/charts/LineChartComponent";
 import SKUOrderDetails from "../components/common/SKUOrderDetails";
-import {  Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import MyDateRangePicker from "../components/orders/DateRangePicker";
+import { FilteredData, filterSKUOrderDetails, filterSKUOrderDetailsByWeek } from "../utils/dataTransformationsByClient";
+import useLoading from "../hooks/useLoading";
+import DoubleBarChartComponent from "../components/charts/DoubleBarChartComponent";
 
 const OrdersByCustomerDashboard: React.FC = () => {
   const { selectedCustomer } = useSelectedCustomer();
-  const {ordersByClientData, top10OrdersConfimredBySku,summary, setClientId, dateRange, setApiCallToggle,handleDateRangeChange,isFilterdOrdersDataLoading  } = useOrdersByClientDashboardData()
-  // console.log("FETCHED ORDERS",ordersByClientData)
-
-  const dataToShow = {
-
-    labels: ["1st", "2nd", "3rd", "4th", "5th"],
-    datasets: [
-        {
-            label: "# of units",
-            data: [10, 20,30, 23,19],
-            backgroundColor: '#FF6384',
-            borderColor:'#FF6384',
-            hoverBackgroundColor: '#d35671',
-            borderWidth: 2,
-        },
-        {
-            label: "# of orders",
-            data: [8, 20, 24, 20, 10],
-            backgroundColor: '#FFCE56',
-            borderColor:'#FFCE56',
-            hoverBackgroundColor: '#e6b453',
-            borderWidth: 2,
-        }]
-  }
-
+  const { ordersByClientData, top10OrdersConfimredBySku, top10UnitsConfimredBySku, summary, setClientId, dateRange, setApiCallToggle, handleDateRangeChange, isFilterdOrdersDataLoading } = useOrdersByClientDashboardData()
+  
   const [searchTerm, setSearchTerm] = useState<string>(""); // Searching from list of SKUs
   const [selectedItem, setSelectedItem] = useState<string>(""); //selected SKU from the list
+  const [showByOrders, setShowByOrders] = useState<boolean>(false); // for toggling between top10 units and orders 
+  const [showDaily, setShowDaily] = useState<boolean>(false); // for toggling between top10 units and orders 
+  const [ filteredDetails, setFilteredDetails] = useState<FilteredData | null>();
 
+  const { isLoading, startLoading, stopLoading } = useLoading(); 
+  
   const [listShow, setListShow] = useState(true); //list on mobile view
   const [overviewShow, setOverviewShow] = useState(true); //overview on mobile view
-
+  
+  const dataToShow = {
+    labels: filteredDetails?.dates ?? [""],
+    datasets: [
+      {
+        label: "# of Orders",
+        data: filteredDetails?.totalOrders ?? [0],
+        backgroundColor: '#FF6384',
+        hoverBackgroundColor: '#d35671',
+        borderWidth: 2,
+      },
+      {
+        label: "# of units",
+        data: filteredDetails?.totalUnits ?? [0],
+        backgroundColor: '#FFCE56',
+        hoverBackgroundColor: '#e6b453',
+        borderWidth: 2,
+      }]
+    }
+    const shouldShowLineChart = dataToShow && dataToShow.labels && dataToShow.labels.length >= 15;
 
   //helpers
 
   const getUniqueItems = (items: any[]): string[] => {
     const seenSkus = new Set<string>();
-  
+
     items.forEach((item: { sku: string }) => {
       seenSkus.add(item.sku);
     });
-  
+
     return Array.from(seenSkus);
   };
 
 
   const filterItemsBySearchTerm = (items: string[], searchTerm: string): string[] => {
-    return items.filter((item: string) => 
+    return items.filter((item: string) =>
       item.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
-  
 
-   const uniqueItems = ordersByClientData &&  getUniqueItems(ordersByClientData.dbData.skusales)
-  const filteredItems = uniqueItems && filterItemsBySearchTerm(uniqueItems, searchTerm)  
-  
-   
+
+  const uniqueItems = ordersByClientData && getUniqueItems(ordersByClientData.dbData.skusales)
+  const filteredItems = uniqueItems && filterItemsBySearchTerm(uniqueItems, searchTerm)
+
+
 
   const handleSKUSelect = (item: string): void => {
     setListShow(false);
@@ -81,10 +85,26 @@ const OrdersByCustomerDashboard: React.FC = () => {
 
   useEffect(() => {
     setClientId(selectedCustomer.customerId.toString())
+    setSelectedItem("")
+
   }, [selectedCustomer]);
   useEffect(() => {
     setSelectedItem("")
-  }, [ordersByClientData]);
+
+  }, [dateRange]);
+
+  useEffect(() => {
+    const asyncFilter = async () => {
+      startLoading();
+
+        const result = await showDaily ? filterSKUOrderDetails(ordersByClientData.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString()) : filterSKUOrderDetailsByWeek(ordersByClientData.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString()) ;
+        
+        setFilteredDetails(result);
+        stopLoading();
+    };
+
+    asyncFilter();
+  }, [ordersByClientData, showDaily]);
 
 
   const clearSearch = () => {
@@ -96,15 +116,11 @@ const OrdersByCustomerDashboard: React.FC = () => {
     <Container fluid style={{ minHeight: "85vh" }}>
       <Row
         style={{
-          height: innerWidth < 500 ? (overviewShow ? "65vh" : "5vh") : "45vh",
+          height: innerWidth < 500 ? (overviewShow ? "70vh" : "5vh") : "63vh",
           overflowY: innerWidth < 500 ? (overviewShow ? "auto" : "hidden") : "auto",
           transition: "height 0.5s ease-in-out",
         }}
       >
-              <Row className="sub-row" md={4}>
-        <Form.Label>Date Range</Form.Label>
-        <MyDateRangePicker dateRange={dateRange} handleDateRangeChange={handleDateRangeChange} setApiCallToggle={setApiCallToggle} />
-      </Row>
         <div className="flex-apart">
           <h1>{selectedCustomer?.companyName}</h1>{" "}
           <div>
@@ -123,21 +139,66 @@ const OrdersByCustomerDashboard: React.FC = () => {
           <Loader />
         ) : (
           <>
-            <Col md={4} sm={12} style={{margin:'auto 0'}}>
-            {
+        <Row className="sub-row" md={5} style={{display:'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Form.Label style={{display: 'flex',justifyContent:'right', alignItems: 'center', width: 'auto'}}>Date Range:</Form.Label>
+          <MyDateRangePicker dateRange={dateRange} handleDateRangeChange={handleDateRangeChange} setApiCallToggle={setApiCallToggle} />
+              {summary &&
+                <OrdersByClientSummary summary={summary} width="20%" />
+              }
+        </Row>
+            <Col md={4} sm={12} style={{ margin: 'auto 0' }}>
+              <>
+                <Form.Group>
+                  <div className="inline-checkbox">
+                    <Form.Check
+                      type="switch"
+                      label="By orders"
+                      checked={showByOrders}
+                      onChange={() => setShowByOrders(!showByOrders)}
+                    />
+                  </div>
+                </Form.Group>
 
-!top10OrdersConfimredBySku  ? <Loader dims={50}/> : <BarChartComponent barChartData={top10OrdersConfimredBySku ? top10OrdersConfimredBySku : {}} dataLabel={true} isArranged={true} />
-                    }
+                {
+                  showByOrders
+                    ? (
+                      top10OrdersConfimredBySku
+                        ? <BarChartComponent barChartData={top10OrdersConfimredBySku ?? {}} dataLabel={true} isArranged={true} />
+                        : <Loader dims={50} />
+                    )
+                    : (
+                      top10UnitsConfimredBySku
+                        ? <BarChartComponent barChartData={top10UnitsConfimredBySku ?? {}} dataLabel={true} isArranged={true} />
+                        : <Loader dims={50} />
+                    )
+                }
+              </>
             </Col>
-            <Col md={3} sm={12} style={{margin:'auto 0'}}>
-              {summary &&  
-             <OrdersByClientSummary summary={summary} width="80%" />
-              }</Col>
-            <Col md={5} sm={12} style={{margin:'auto 0'}}>
-            {
 
-<LineChartComponent lineChart={dataToShow} minHeight='auto' minWidth="auto"/>
-}
+            <Col xs={12} md={8}>
+            <Row>
+            <Form.Group>
+                  <div className="inline-checkbox">
+                    <Form.Check
+                      type="switch"
+                      label="Daily"
+                      checked={showDaily}
+                      onChange={() => setShowDaily(!showDaily)}
+                    />
+                  </div>
+                </Form.Group>
+            </Row>
+            <Row  style={{ display: "flex", justifyContent: "center", height: "26rem"  }}>
+            {isLoading && isFilterdOrdersDataLoading ? (
+                <Loader />
+              ) : shouldShowLineChart && dataToShow ? (
+                <LineChartComponent lineChart={dataToShow} />
+              ) : dataToShow ? (
+                <DoubleBarChartComponent doubleBarChart={dataToShow} />
+              ) : null}
+            </Row>
+
+
             </Col>
           </>
         )}
@@ -145,7 +206,7 @@ const OrdersByCustomerDashboard: React.FC = () => {
       <hr />
       <Row>
         <Col lg={3} md={4} sm={6} xs={12} style={{ maxHeight: "70vh", overflowY: "auto" }}>
-          {!filteredItems ?  <Loader /> :          <SKUList
+          {!filteredItems ? <Loader /> : <SKUList
             items={filteredItems}
             selectedItem={selectedItem}
             searchTerm={searchTerm}
@@ -155,19 +216,19 @@ const OrdersByCustomerDashboard: React.FC = () => {
             setListShow={setListShow}
             onSearch={setSearchTerm}
             onClearSearch={clearSearch}
-          />  }
+          />}
 
         </Col>
         {window.innerWidth <= 768 ? <hr /> : <></>}
         <Col lg={9} md={8} sm={6} xs={12} style={{ maxHeight: "70vh", overflowY: "auto" }}>
           <div>
-            {isFilterdOrdersDataLoading ? <Loader/> : selectedItem ? (
+            {isFilterdOrdersDataLoading ? <Loader /> : selectedItem ? (
               <>
-              <SKUOrderDetails
-                selectedItem={selectedItem}
-                details={ordersByClientData.dbData.skusales|| {}}
-                dateRange = {dateRange}
-              />
+                <SKUOrderDetails
+                  selectedItem={selectedItem}
+                  details={ordersByClientData.dbData.skusales || {}}
+                  dateRange={dateRange}
+                />
               </>
             ) : (
               <p>Select an item to view details</p>

@@ -4,7 +4,7 @@ import useOrdersByClientData
  from '../hooks/useOrdersByClientData'
 import { useLoading } from './LoadingContext';
 import { Top10BarChartData } from '../components/orders/OrdersDashboardComponent';
-import { Summary, createSummary, transformOrdersDataForTop10SkusOrdered } from '../utils/dataTransformationsByClient';
+import { Summary, createSummary, transformOrdersDataForTop10SkusOrdered,transformUnitsDataForTop10SkusOrdered } from '../utils/dataTransformationsByClient';
 import { addDays, startOfWeek, subDays, subMonths } from 'date-fns';
 
 export interface DateRange {
@@ -18,6 +18,7 @@ interface DataContextType {
 ordersByClientData: any | null;
 fetchOrdersByClient: (clientId: string) => any;
 top10OrdersConfimredBySku: Top10BarChartData | null |undefined;
+top10UnitsConfimredBySku: Top10BarChartData | null |undefined;
 summary: Summary | null |undefined;
 isOrdersByClientDataLoading: boolean;
 dateRange: DateRange;
@@ -48,6 +49,7 @@ const startOfWeekAfterSixMonthsAgo = addDays(startOfWeek(sixMonthsAgo, { weekSta
 
  const [clientId, setClientId] = useState<string | null>();
    const [top10OrdersConfimredBySku, setTop10OrdersConfimredBySku] = useState<Top10BarChartData | null>()
+   const [top10UnitsConfimredBySku, setTop10UnitsConfimredBySku] = useState<Top10BarChartData | null>()
    const [summary, setSummary] = useState<Summary | null>()
    const [dateRange, setDateRange] = useState<DateRange>({
     startDate: startOfWeekAfterSixMonthsAgo,
@@ -61,8 +63,8 @@ const [apiCall, setApiCall] = useState<boolean>(false);
 
     useEffect(() => {
 if(ordersByClientData) {
-
     setTop10OrdersConfimredBySku(transformOrdersDataForTop10SkusOrdered(ordersByClientData.dbData.skusales));
+    setTop10UnitsConfimredBySku(transformUnitsDataForTop10SkusOrdered(ordersByClientData.dbData.skusales));
     setSummary(createSummary(ordersByClientData.dbData.skusales))
 }
     }, [ordersByClientData])
@@ -98,26 +100,14 @@ stopFilterdOrdersDataLoading();
 
   const fetchDataIfRequired = async (dr : DateRange) => {
 
-    console.log("I am being called")
-    const isWithingPrevDateRange = (startDate: Date, endDate: Date): boolean => {
-      if(prevDateRange) {
-       return startDate >= prevDateRange?.startDate && endDate <= prevDateRange?.endDate;
-      } 
-     else return false;
-   };
- 
    const { startDate, endDate } = dr;
 
-   console.log("DATE RANGE NEW IS:", dateRange)
-   
-   if (!isWithingPrevDateRange(startDate, endDate)) {
     startFilterdOrdersDataLoading();
 
        await clientId && clientId != undefined && fetchOrdersByClientDatawithRange(startDate, endDate, clientId)
        setPrevDateRange({startDate: startDate, endDate: endDate, key: 'selection',} )
-       console.log("FROM INSIDE the function")
        stopFilterdOrdersDataLoading();
-   }
+   
   }
 
   const value: DataContextType = {
@@ -125,6 +115,7 @@ stopFilterdOrdersDataLoading();
     ordersByClientData,
     fetchOrdersByClient,
     top10OrdersConfimredBySku,
+    top10UnitsConfimredBySku,
     isOrdersByClientDataLoading,
     summary,
     dateRange,

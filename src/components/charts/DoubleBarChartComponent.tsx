@@ -20,8 +20,8 @@ interface DoubleBarChart {
   datasets: {
     label: string;
     data: number[];
-    backgroundColor: string[];
-    hoverBackgroundColor: string[];
+    backgroundColor: string[] | string;
+    hoverBackgroundColor: string[] | string;
     borderWidth: number;
   }[];
 }
@@ -64,7 +64,7 @@ const DoubleBarChartComponent: React.FC<{ doubleBarChart?: Partial<DoubleBarChar
     plugins: {
       datalabels: {
         color: 'black',
-        formatter: (value: number) => value, // Display the value
+        formatter: (value: number) => new Intl.NumberFormat().format(value),
         font: {
           size:innerWidth < 500 ? 8:  10 // Set the font size of data labels
         },
