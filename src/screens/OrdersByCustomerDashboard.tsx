@@ -35,18 +35,20 @@ const OrdersByCustomerDashboard: React.FC = () => {
   const dataToShow = {
     labels: filteredDetails?.dates ?? [""],
     datasets: [
-      {
-        label: "# of Orders",
-        data: filteredDetails?.totalOrders ?? [0],
-        backgroundColor: '#FF6384',
-        hoverBackgroundColor: '#d35671',
-        borderWidth: 2,
-      },
+      // {
+      //   label: "# of Orders",
+      //   data: filteredDetails?.totalOrders ?? [0],
+      //   backgroundColor: '#FFCE56',
+      //   borderColor: '#FFCE56',
+      //   hoverBackgroundColor: '#e6b453',
+      //   borderWidth: 2,
+      // },
       {
         label: "# of units",
         data: filteredDetails?.totalUnits ?? [0],
-        backgroundColor: '#FFCE56',
-        hoverBackgroundColor: '#e6b453',
+        backgroundColor: '#FF6384',
+        borderColor: '#FF6384',
+        hoverBackgroundColor: '#d35671',
         borderWidth: 2,
       }]
     }
@@ -97,7 +99,7 @@ const OrdersByCustomerDashboard: React.FC = () => {
     const asyncFilter = async () => {
       startLoading();
 
-        const result = await showDaily ? filterSKUOrderDetails(ordersByClientData.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString()) : filterSKUOrderDetailsByWeek(ordersByClientData.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString()) ;
+        const result =  ordersByClientData && (showDaily ? filterSKUOrderDetails(ordersByClientData?.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString()) : filterSKUOrderDetailsByWeek(ordersByClientData?.dbData.skusales, dateRange.startDate.toString(), dateRange.endDate.toString())) ;
         
         setFilteredDetails(result);
         stopLoading();

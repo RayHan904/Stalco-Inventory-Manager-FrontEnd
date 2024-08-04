@@ -5,7 +5,7 @@ interface SummaryProps {
     summary: {
         totalOrders: number;
         totalUnits: number;
-        avgUnits: number;
+        avgUnits: number | string;
     }
 }
 
@@ -22,7 +22,7 @@ const OrdersByClientSummary: React.FC<OrdersByClientSummaryProps> = ({ summary, 
     return (
         <>
             <InfoCardComponent cardTitle="Total Orders" text={totalOrders.toLocaleString()} width={width} />
-            <InfoCardComponent cardTitle="Total Units Sold" text={totalUnits.toLocaleString()} width={width} />
+            <InfoCardComponent cardTitle="Total Units Processed" text={totalUnits.toLocaleString()} width={width} />
             <InfoCardComponent cardTitle="Avg units per order" text={avgUnits.toLocaleString()} width={width} />
         </>
     );

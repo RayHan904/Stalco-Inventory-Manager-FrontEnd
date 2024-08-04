@@ -129,13 +129,15 @@ export const filterRegionShipped = (filter: Filter, data: regionShipped[] | unde
 
 
 export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[], dateRange: DateRange): DynamicData => {
-    const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number } } = {};
+    const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number, avg_qty_per_order: number, count: number } } = {};
 
     let totalOrders = 0;
     let totalUs = 0;
     let totalCa = 0;
     let totalIntl = 0;
     let totalInternal = 0;
+    let totalAvgQtyPerOrder = 0;
+    let totalCount = 0;
 
     // Initialize all weeks within the range with zero values
 
@@ -147,7 +149,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
 
     while (currentWeekStart <= endWeekStart) {
         const weekLabel = `${currentWeekStart.getFullYear()}-W${getISOWeek(currentWeekStart).toString().padStart(2, '0')}`;
-        aggregatedData[weekLabel] = { us: 0, canada: 0, internal: 0, intl: 0 };
+        aggregatedData[weekLabel] = { us: 0, canada: 0, internal: 0, intl: 0, avg_qty_per_order: 0, count: 0 };
         currentWeekStart = addWeeks(currentWeekStart, 1);
     }
 
@@ -158,7 +160,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
         const weekLabel = `${year}-W${week.toString().padStart(2, '0')}`;
 
         if (!aggregatedData[weekLabel]) {
-            aggregatedData[weekLabel] = { us: 0, canada: 0, internal: 0, intl: 0 };
+            aggregatedData[weekLabel] = { us: 0, canada: 0, internal: 0, intl: 0, avg_qty_per_order: 0, count: 0 };
         }
         totalOrders += order.us + order.canada + order.internal + order.intl;
 
@@ -170,6 +172,12 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
         totalInternal += order.internal;
         aggregatedData[weekLabel].intl += order.intl;
         totalIntl += order.intl;
+
+        aggregatedData[weekLabel].avg_qty_per_order += parseFloat(order.avg_qty_per_order);
+        aggregatedData[weekLabel].count += 1;
+        totalAvgQtyPerOrder += parseFloat(order.avg_qty_per_order);
+        totalCount += 1;
+
     });
 
     const labels = Object.keys(aggregatedData).sort((a, b) => {
@@ -191,7 +199,11 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
         canadaData.push(aggregatedData[label].canada);
         internalData.push(aggregatedData[label].internal);
         intlData.push(aggregatedData[label].intl);
+
     });
+
+    const overallAvgQtyPerOrder = totalCount > 0 ? totalAvgQtyPerOrder / totalCount : 0;
+
 
     return {
         totalOrders,
@@ -200,6 +212,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerWeek = (orders: Order[]
         totalInternal,
         totalIntl,
         labels,
+        overallAvgQtyPerOrder,
         datasets: [
             {
                 label: "# of units (Internal)",
@@ -496,13 +509,15 @@ export const transformOrdersDataForOrderVolumeByCarrierPerDate = (orders: Order[
 }
 
 export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[], dateRange: DateRange): DynamicData =>  {
-    const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number } } = {};
+    const aggregatedData: { [key: string]: { us: number, canada: number, internal: number, intl: number, avg_qty_per_order: 0, count: 0 } } = {};
  
     let totalOrders = 0;
     let totalUs = 0;
     let totalCa = 0;
     let totalIntl = 0;
     let totalInternal = 0;
+    let totalAvgQtyPerOrder = 0;
+    let totalCount = 0;
 
     // Initialize all dates within the range with zero values
     const currentDate = new Date(dateRange.startDate);
@@ -510,13 +525,13 @@ export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]
 
     while (currentDate <= endDate) {
         const dateString = currentDate.toISOString().split('T')[0];
-        aggregatedData[dateString] = { us: 0, canada: 0, internal: 0, intl: 0 };
+        aggregatedData[dateString] = { us: 0, canada: 0, internal: 0, intl: 0, avg_qty_per_order: 0, count: 0 }
         currentDate.setDate(currentDate.getDate() + 1);
     }
 
     orders.forEach(order => {
         if (!aggregatedData[order.date]) {
-            aggregatedData[order.date] = { us: 0, canada: 0, internal: 0, intl: 0 };
+            aggregatedData[order.date] = { us: 0, canada: 0, internal: 0, intl: 0, avg_qty_per_order: 0, count: 0 };
         }
         totalOrders += order.us + order.canada + order.internal + order.intl;
 
@@ -530,6 +545,11 @@ export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]
 
         aggregatedData[order.date].intl += order.intl;
         totalIntl += order.intl;
+
+        aggregatedData[order.date].avg_qty_per_order += parseFloat(order.avg_qty_per_order);
+        aggregatedData[order.date].count += 1;
+        totalAvgQtyPerOrder += parseFloat(order.avg_qty_per_order);
+        totalCount += 1;
     });
 
     const labels = Object.keys(aggregatedData).sort();
@@ -545,6 +565,9 @@ export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]
         intlData.push(aggregatedData[label].intl);
     });
 
+    const overallAvgQtyPerOrder = totalCount > 0 ? totalAvgQtyPerOrder / totalCount : 0;
+
+
     return {
         totalOrders,
         totalUs,
@@ -552,6 +575,7 @@ export const transformOrdersDataForOrderVolumeByRegionPerDate = (orders: Order[]
         totalInternal,
         totalIntl,
         labels,
+        overallAvgQtyPerOrder,
         datasets: [
             {
                 label: "# of units (Internal)",

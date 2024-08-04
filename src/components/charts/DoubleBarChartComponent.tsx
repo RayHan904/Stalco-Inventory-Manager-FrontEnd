@@ -21,6 +21,7 @@ interface DoubleBarChart {
     label: string;
     data: number[];
     backgroundColor: string[] | string;
+    borderColor?: string[] | string;
     hoverBackgroundColor: string[] | string;
     borderWidth: number;
   }[];
@@ -46,7 +47,7 @@ const defaultDoubleBarChart: DoubleBarChart = {
   ],
 };
 
-const DoubleBarChartComponent: React.FC<{ doubleBarChart?: Partial<DoubleBarChart> }> = ({ doubleBarChart = {} }) => {
+const DoubleBarChartComponent: React.FC<{ doubleBarChart?: Partial<DoubleBarChart>, minWidth? : string, minHeight?: string  }> = ({ doubleBarChart = {}, minHeight='400px', minWidth='800px' }) => {
   const {
     labels = defaultDoubleBarChart.labels,
     datasets = defaultDoubleBarChart.datasets,
@@ -76,7 +77,15 @@ const DoubleBarChartComponent: React.FC<{ doubleBarChart?: Partial<DoubleBarChar
 
   };
 
-  return <Bar  style={{  height:'100%',margin:'auto'}} data={chartData} options={options} />;
+  return (
+    <div style={{ overflowX: 'auto' }}>
+    <div style={{ width: '100% ', minWidth: minWidth, minHeight: minHeight }}> {/* Adjust width as needed */}
+    <Bar  data={chartData} options={options} />
+    </div>
+  </div> 
+  )
+  
+
 };
 
 export default DoubleBarChartComponent;

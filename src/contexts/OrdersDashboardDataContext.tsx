@@ -200,7 +200,6 @@ const handleApplyFilter = async () => {
 
   const fetchDataIfRequired = async (dr : DateRange) => {
 
-    console.log("I am being called")
     const isWithingPrevDateRange = (startDate: Date, endDate: Date): boolean => {
       if(prevDateRange) {
        return startDate >= prevDateRange?.startDate && endDate <= prevDateRange?.endDate;

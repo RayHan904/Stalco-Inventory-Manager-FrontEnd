@@ -26,6 +26,11 @@ dbData:{
 }
   }
 
+  export interface TotalOrderByClientData {
+      totalOrders: any;
+      avgQtyPerOrder: any;
+  }
+
  export interface SKUReplenishmentData {
     sku: string;
     clientId: string;
@@ -255,6 +260,22 @@ export async function fetchThreshold() {
       return response.data;
     } catch (error) {
       console.error("Error fetching Orders data by range:", error);
+      throw error;
+    }
+  };
+
+  export const fetchTotalOrdersByClientDataByRange = async (startDate: Date, endDate: Date, clientId:string) => {
+    try {
+      console.log("FETCHING TOTAL & AVG ORDERS DATA BY RANGE FOR A CLIENT");
+      const response = await axios.get(`${BASE_URL}${ORDERS_URL}/total-orders/date-range/${clientId}`, {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Total & Avg Orders data by range:", error);
       throw error;
     }
   };

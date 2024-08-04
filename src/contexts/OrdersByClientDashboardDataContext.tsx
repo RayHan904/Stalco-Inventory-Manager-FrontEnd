@@ -36,7 +36,7 @@ interface DataProviderProps {
 }
 
 export const OrdersByClientDashboardDataProvider: React.FC<DataProviderProps> = ({ children }) => {
-   const { fetchOrdersByClient, ordersByClientData, isOrdersByClientDataLoading, fetchOrdersByClientDatawithRange } = useOrdersByClientData();
+   const { fetchOrdersByClient, ordersByClientData, isOrdersByClientDataLoading, fetchOrdersByClientDatawithRange, totalOrdersData, fetchTotalOrdersByClientDataWithRange } = useOrdersByClientData();
    const { isLoading: isFilterdOrdersDataLoading, startLoading: startFilterdOrdersDataLoading, stopLoading: stopFilterdOrdersDataLoading } = useLoading();
 const yesterday = subDays(new Date(), 1);
 const now = new Date();
@@ -65,7 +65,7 @@ const [apiCall, setApiCall] = useState<boolean>(false);
 if(ordersByClientData) {
     setTop10OrdersConfimredBySku(transformOrdersDataForTop10SkusOrdered(ordersByClientData.dbData.skusales));
     setTop10UnitsConfimredBySku(transformUnitsDataForTop10SkusOrdered(ordersByClientData.dbData.skusales));
-    setSummary(createSummary(ordersByClientData.dbData.skusales))
+    setSummary(createSummary(ordersByClientData.dbData.skusales, totalOrdersData))
 }
     }, [ordersByClientData])
 
@@ -76,7 +76,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchData = async () => {
     startFilterdOrdersDataLoading()
-    await clientId && clientId != undefined && fetchOrdersByClient(clientId);
+     clientId && clientId != undefined && fetchOrdersByClient(clientId);
 stopFilterdOrdersDataLoading();
   } 
   fetchData();
@@ -104,7 +104,9 @@ stopFilterdOrdersDataLoading();
 
     startFilterdOrdersDataLoading();
 
-       await clientId && clientId != undefined && fetchOrdersByClientDatawithRange(startDate, endDate, clientId)
+        clientId && clientId != undefined && fetchOrdersByClientDatawithRange(startDate, endDate, clientId)
+        clientId && clientId != undefined && fetchTotalOrdersByClientDataWithRange(startDate, endDate, clientId)
+        
        setPrevDateRange({startDate: startDate, endDate: endDate, key: 'selection',} )
        stopFilterdOrdersDataLoading();
    

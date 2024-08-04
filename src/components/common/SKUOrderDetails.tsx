@@ -21,7 +21,7 @@ const SKUOrderDetails: React.FC<SKUOrderDetailsProps> = ({
   details,
 dateRange,
 }) => {
-  const {isFilterdOrdersDataLoading  } = useOrdersByClientDashboardData()
+  const {isFilterdOrdersDataLoading, ordersByClientData } = useOrdersByClientDashboardData()
 
   const { isLoading, startLoading, stopLoading } = useLoading(); //while loading inventoryData
  const [ filteredDetails, setFilteredDetails] = useState<FilteredData | null>();
@@ -36,6 +36,7 @@ dateRange,
        label: "# of Orders",
        data: filteredDetails?.totalOrders ?? [0],
        backgroundColor: '#FF9F40',
+       borderColor: '#FF9F40',
        hoverBackgroundColor: '#d48136',
        borderWidth: 2,
       },
@@ -43,6 +44,7 @@ dateRange,
         label: "# of units",
         data: filteredDetails?.totalUnits ?? [0],
         backgroundColor: '#9966FF',
+        borderColor: '#9966FF',
         hoverBackgroundColor: '#7d5fcc',
         borderWidth: 2,
       }]
@@ -54,7 +56,7 @@ dateRange,
  useEffect(() => {
     const asyncFilter = async () => {
       startLoading();
-        const result = await showDaily? filterSKUOrderDetails(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem) : filterSKUOrderDetailsByWeek(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem);
+        const result = ordersByClientData &&  (showDaily? filterSKUOrderDetails(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem) : filterSKUOrderDetailsByWeek(details, dateRange.startDate.toString(), dateRange.endDate.toString(),selectedItem));
         setFilteredDetails(result);
         stopLoading();
     };

@@ -58,6 +58,7 @@ export interface DynamicData {
     totalCa? :number,
     totalInternal? :number,
     totalIntl? :number,
+    overallAvgQtyPerOrder? :number ,
     labels: string[];
     datasets: Dataset[];
 }
@@ -69,6 +70,7 @@ export interface ByCarrierDynamicData {
     totalFEDEX? :number,
     totalUPS? :number,
     totalOthers? :number,
+    overallAvgQtyPerOrder? :number ,
     labels: string[];
     datasets: Dataset[];
 }
@@ -236,7 +238,7 @@ const OrdersDashboardComponent: React.FC = () => {
       Total Inventory Sold: 
     </ListGroup.Item>
     <ListGroup.Item>
-      Average Units per Order: 
+      Average Units per Order:  {dynamicData ? dynamicData.overallAvgQtyPerOrder?.toFixed(2) : "-"}
     </ListGroup.Item>
     </ListGroup>
     </Row>
